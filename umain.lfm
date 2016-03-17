@@ -1,0 +1,95 @@
+object MainForm: TMainForm
+  Left = 374
+  Height = 586
+  Top = 131
+  Width = 742
+  Caption = 'Main'
+  ClientHeight = 566
+  ClientWidth = 742
+  Menu = MainMenu
+  OnCreate = FormCreate
+  LCLVersion = '1.6.0.4'
+  object DBGrid: TDBGrid
+    Left = 16
+    Height = 360
+    Top = 200
+    Width = 720
+    Color = clWindow
+    Columns = <>
+    DataSource = DataSource
+    DefaultRowHeight = 20
+    TabOrder = 0
+  end
+  object IBConnection: TIBConnection
+    Connected = True
+    LoginPrompt = False
+    DatabaseName = 'C:\Users\razumbook\db\MY.FDB'
+    KeepConnection = False
+    Password = 'masterkey'
+    Transaction = SQLTransaction
+    UserName = 'SYSDBA'
+    Options = []
+    left = 56
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <    
+      item
+        Name = 'ID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'NAME'
+        DataType = ftString
+        Precision = -1
+        Size = 400
+      end    
+      item
+        Name = 'PARENT_ID'
+        DataType = ftInteger
+        Precision = -1
+      end>
+    Database = IBConnection
+    Transaction = SQLTransaction
+    SQL.Strings = (
+      'SELECT * FROM UNITS;'
+    )
+    InsertSQL.Strings = (
+      'SELECT * FROM UNITS;'
+    )
+    Options = []
+    Params = <>
+    top = 48
+  end
+  object DataSource: TDataSource
+    DataSet = SQLQuery
+  end
+  object SQLTransaction: TSQLTransaction
+    Active = False
+    Database = IBConnection
+    Options = []
+    left = 56
+    top = 48
+  end
+  object MainMenu: TMainMenu
+    left = 120
+    top = 8
+    object FileItem: TMenuItem
+      Caption = 'Файл'
+      object ExitItem: TMenuItem
+        Caption = 'Выход'
+        OnClick = ExitItemClick
+      end
+    end
+    object ShowTableItem: TMenuItem
+      Caption = 'Показать таблицу'
+    end
+    object HelpItem: TMenuItem
+      Caption = 'Помощь'
+      object AbAutorItem: TMenuItem
+        Caption = 'Об авторе'
+        OnClick = AbAutorItemClick
+      end
+    end
+  end
+end

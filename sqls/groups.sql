@@ -1,0 +1,2 @@
+SELECT g.NAME
+  FROM GROUPS g
