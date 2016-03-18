@@ -51,7 +51,7 @@ end;
 
 procedure TMainForm.AbAutorItemClick(Sender: TObject);
 begin
-    ShowMessage('Разумов Максим, Б8103а' + ''#10'' + ' https://github.com/7cats/db-dvfu-');
+    ShowMessage('Разумов Максим, Б8103а' + ''#13'' + 'https://github.com/7cats/db-dvfu-');
 end;
 
 procedure TMainForm.ExitItemClick(Sender: TObject);
@@ -62,16 +62,25 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
     SQLTableList := TSQLTableList.Create();
-    //(sqlpath : string; ItemCap: string; ItemName: string; ParentItem : TMenuItem);
     SQLTableList.NewItem('./sqls/groups.sql', 'Группы', 0, ShowTableItem, @ShowTableOnClick);
     SQLTableList.NewItem('./sqls/lessons.sql', 'Предметы', 1, ShowTableItem, @ShowTableOnClick);
     SQLTableList.NewItem('./sqls/teachers.sql', 'Преподаватели', 2, ShowTableItem, @ShowTableOnClick);
     SQLTableList.NewItem('./sqls/timelessons.sql', 'Время занятий', 3, ShowTableItem, @ShowTableOnClick);
+    SQLTableList.NewItem('./sqls/schedule.sql', 'Расписание', 4, ShowTableItem, @ShowTableOnClick);
 end;
 
 procedure TMainForm.ShowTableOnClick(Sender: TObject);
+var
+    i : integer;
+    NForm : TMainForm;
 begin
-    SQLTableList[(Sender as TMenuItem).Tag].ShowTable(SQLQuery);
+    NForm := TMainForm.Create(MainForm);
+    SQLTableList[(Sender as TMenuItem).Tag].ShowNewFormTable(NForm.SQLQuery);
+    for i := 0 to NForm.DBGrid.Columns.Count - 1 do begin
+        NForm.DBGrid.Columns[i].Width := 300;
+    end;
+    NForm.Caption:= 'Новый запрос';
+    NForm.Show();
 end;
 
 

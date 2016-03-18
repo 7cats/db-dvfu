@@ -5,7 +5,8 @@ unit utable;
 interface
 
 uses
-     Classes, SysUtils, menus, sqldb, db, DBGrids;
+         Classes, SysUtils, IBConnection, sqldb, db, FileUtil, Forms, Controls,
+    Graphics, Dialogs, DBGrids, Menus;
 
 type
     TOnClickProcOfObject = procedure (Sender: TObject) of object;
@@ -17,7 +18,7 @@ type
             FItemName: string;
             FSQLReq : TStringList;
         public
-            procedure ShowTable(SQLquery : TSQLQuery);
+            procedure ShowNewFormTable(SQLQuery : TSQLQuery);
             constructor Create(sqlpath: string; ItemCap: string; ItemTag: integer;
                         ParentItem: TMenuItem; OnClick : TOnClickProcOfObject);
     end;
@@ -62,7 +63,7 @@ end;
 
 { TSQLTable }
 
-procedure TSQLTable.ShowTable(SQLquery: TSQLQuery);
+procedure TSQLTable.ShowNewFormTable(SQLQuery: TSQLQuery);
 begin
     SQLQuery.Close;
     SQLQuery.SQL := FSQLReq;
