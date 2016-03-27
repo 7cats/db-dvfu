@@ -5,30 +5,25 @@ unit UMain;
 interface
 
 uses
-    Classes, SysUtils, IBConnection, sqldb, db, FileUtil, Forms, Controls,
-    Graphics, Dialogs, DBGrids, Menus, utable;
+    Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls,
+    Graphics, Dialogs, DBGrids, Menus, udb, urequestform;
 
 type
 
     { TMainForm }
 
     TMainForm = class(TForm)
-        DataSource: TDataSource;
-        DBGrid: TDBGrid;
-        IBConnection: TIBConnection;
-        MainMenu: TMainMenu;
-        FileItem: TMenuItem;
         AbAutorItem: TMenuItem;
         ExitItem: TMenuItem;
-        ShowTableItem: TMenuItem;
+        FileItem: TMenuItem;
         HelpItem: TMenuItem;
-        SQLQuery: TSQLQuery;
-        SQLTransaction: TSQLTransaction;
+        MainMenu: TMainMenu;
+        ShowTableItem: TMenuItem;
         procedure AbAutorItemClick(Sender: TObject);
-        procedure Button1Click(Sender: TObject);
         procedure ExitItemClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
         procedure ShowTableOnClick(Sender: TObject);
+        procedure AddNewTableItem(nameI, captionI : string; index : integer);
     private
         { private declarations }
     public
@@ -44,10 +39,6 @@ implementation
 
 { TMainForm }
 
-procedure TMainForm.Button1Click(Sender: TObject);
-begin
-    SQLQuery.Active:= true;
-end;
 
 procedure TMainForm.AbAutorItemClick(Sender: TObject);
 begin
@@ -61,27 +52,32 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-    SQLTableList := TSQLTableList.Create();
-    SQLTableList.NewItem('./sqls/groups.sql', 'Группы', 0, ShowTableItem, @ShowTableOnClick);
-    SQLTableList.NewItem('./sqls/lessons.sql', 'Предметы', 1, ShowTableItem, @ShowTableOnClick);
-    SQLTableList.NewItem('./sqls/teachers.sql', 'Преподаватели', 2, ShowTableItem, @ShowTableOnClick);
-    SQLTableList.NewItem('./sqls/timelessons.sql', 'Время занятий', 3, ShowTableItem, @ShowTableOnClick);
-    SQLTableList.NewItem('./sqls/schedule.sql', 'Расписание', 4, ShowTableItem, @ShowTableOnClick);
+    DataBase.Connect();
+
+    AddNewTableItem('GroupsItem', 'Группы', 0);
+    AddNewTableItem('LessonsItem', 'Предметы', 1);
+    AddNewTableItem('TeachersItem', 'Преподаватели', 2);
+    AddNewTableItem('LessonsTMItem', 'Время занятий', 3);
+//    AddNewTableItem('ScheduleItem', 'Расписание', 4);
 end;
 
 procedure TMainForm.ShowTableOnClick(Sender: TObject);
-var
-    i : integer;
-    NForm : TMainForm;
 begin
-    NForm := TMainForm.Create(MainForm);
-    SQLTableList[(Sender as TMenuItem).Tag].ShowNewFormTable(NForm.SQLQuery);
-    for i := 0 to NForm.DBGrid.Columns.Count - 1 do begin
-        NForm.DBGrid.Columns[i].Width := 300;
-    end;
-    NForm.Caption:= 'Новый запрос';
-    NForm.Show();
+    TRequestForm.Create(Sender as TMenuItem);
 end;
+
+procedure TMainForm.AddNewTableItem(nameI, captionI: string; index: integer);
+var
+    NewItem: TMenuItem;
+begin
+    NewItem := TMenuItem.Create(ShowTableItem);
+    NewItem.Name := NameI;
+    NewItem.Caption := CaptionI;
+    NewItem.OnClick := @ShowTableOnClick;
+    NewItem.Tag := index;
+    ShowTableItem.Add(NewItem);
+end;
+
 
 
 
