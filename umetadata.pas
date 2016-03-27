@@ -13,22 +13,27 @@ type
         FDBName, FCaption : string;
     end;
 
-    TMetaTable = record
+    { TMetaTable }
+
+    TMetaTable = object
         FTableName, FPrimaryKey : TNameRelation;
         FColumnsNames : array of TNameRelation;
+        function CountOfColumns() : integer;
     end;
 
     { TMetaData }
 
     TMetaData = class
         private
-            function GetItem(i : integer) : TMetaTable;
+            function GetItem(index : integer) : TMetaTable;
+            function GetItem(index : string) : TMetaTable;
         public
             FTables: array of TMetaTable;
             procedure AddTable(DBName, Caption :String);
             procedure AddTableColumn(DBName, Caption: string);
             procedure AddTableColumn(DBName, Caption: string; IsPrimaryKey : boolean);
-            property Items[index : integer] : TMetaTable read GetItem; default;
+            property Items[index : integer] : TMetaTable read GetItem;
+            property ItemsS[index : string] : TMetaTable read GetItem; default;
             constructor Create();
     end;
 
@@ -37,16 +42,37 @@ var
 
 implementation
 
+{ TMetaTable }
+
+function TMetaTable.CountOfColumns: integer;
+begin
+    result := Length(FColumnsNames);
+end;
+
 { TMetadata }
 
-function TMetaData.GetItem(i: integer): TMetaTable;
+function TMetaData.GetItem(index: integer): TMetaTable;
 begin
-    if (i >= Length(FTables)) then begin
+    if (index >= Length(FTables)) then begin
         Raise Exception.Create('Ooooops!');
     end
     else begin
-        result := FTables[i];
+        result := FTables[index];
     end;
+end;
+
+function TMetaData.GetItem(index: string): TMetaTable;
+var
+    i : integer;
+begin
+    for i := 0 to High(FTables) do begin
+        with FTables[i].FTableName do begin
+            if (FCaption = index) or (FDBName= index) then begin
+                exit(FTables[i]);
+            end;
+        end;
+    end;
+    Raise Exception.Create('Invailid table');
 end;
 
 procedure TMetaData.AddTable(DBName, Caption: String);
