@@ -72,13 +72,13 @@ begin
     end;
 
     FRequest.Add('WHERE');
-    FRequest.Add(field);
+    FRequest.Add('Lower(' + field + ')');
     FRequest.Add(Operation);
 
     SetLength(FParams, Length(FParams) + 1);
     FParams[High(FParams)] := Param;
 
-    FRequest.Add(':p' + IntToStr(High(FParams)));
+    FRequest.Add('Lower(' + ':p' + IntToStr(High(FParams)) + ')');
 end;
 
 procedure TRequestBuilder.GetReq(var SQLQuery : TSQLQuery);
