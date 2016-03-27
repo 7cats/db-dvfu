@@ -141,5 +141,14 @@ initialization
         MetaData.AddTableColumn('ID', 'Номер', true);
         MetaData.AddTableColumn('NAME', 'Название');
 
-end.
+    Metadata.AddTable('TIMETABLE','Расписание');
+        Metadata.AddTableColumn('ID', 'ID', true);
+        Metadata.AddTableColumn('WEEKDAY_ID', 'День Недели');
+        Metadata.AddTableColumn('LESSON_TIME_ID', 'Время');
+        Metadata.AddTableColumn('LESSON_ID', 'Название');
+        Metadata.AddTableColumn('LESSON_TYPE_ID', 'Тип');
+        Metadata.AddTableColumn('TEACHER_ID', 'Преподаватель');
+        Metadata.AddTableColumn('GROUP_ID', 'Группа');
+        Metadata.AddTableColumn('CLASSROOM_ID', 'Аудитория');
+ end.
 
