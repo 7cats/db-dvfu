@@ -1,0 +1,38 @@
+object RequestForm: TRequestForm
+  Left = 281
+  Height = 630
+  Top = 204
+  Width = 550
+  Caption = 'RequestForm'
+  ClientHeight = 630
+  ClientWidth = 550
+  OnCreate = FormCreate
+  LCLVersion = '1.6.0.4'
+  object DBGrid: TDBGrid
+    Left = 0
+    Height = 344
+    Top = 0
+    Width = 550
+    Color = clWindow
+    Columns = <>
+    DataSource = DataSource
+    TabOrder = 0
+  end
+  object ToggleBox1: TToggleBox
+    Left = 432
+    Height = 23
+    Top = 560
+    Width = 90
+    Caption = 'ToggleBox1'
+    TabOrder = 1
+  end
+  object DataSource: TDataSource
+    DataSet = SQLQuery
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <>
+    Options = []
+    Params = <>
+    left = 48
+  end
+end
