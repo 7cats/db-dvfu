@@ -44,10 +44,10 @@ begin
     Initial();
     FRequest.Add('SELECT');
     table := MetaData[TableCaption];
-    for i := 0 to table.size() - 1 do begin
+    for i := 0 to table.CountOfColumns() - 1 do begin
         with table.FColumnsNames[i] do begin
             FRequest.Add(FDBName);
-            if (i <> table.size() - 1) then begin
+            if (i <> table.CountOfColumns() - 1) then begin
                 FRequest.Add(',');
             end;
         end;
