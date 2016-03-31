@@ -5,8 +5,7 @@ unit usqlrequestlist;
 interface
 
 uses
-    Classes, SysUtils, IBConnection, sqldb, db, FileUtil, Forms, Controls,
-    Graphics, Dialogs, DBGrids, Menus;
+    Classes, SysUtils;
 
 type
 
@@ -16,7 +15,8 @@ type
         private
             FSQLReq : TStringList;
         public
-            constructor Create(sqlpath: string);
+            constructor Create(const sqlpath: string);
+            destructor Destroy; override;
     end;
 
     { TSQLRequestList }
@@ -26,9 +26,10 @@ type
             FTables: array of TSQLRequest;
             function GetItem( index : integer) : TStringList;
         public
-            procedure NewItem(sqlpath : string);
+            procedure NewItem(const sqlpath : string);
             property Items[index : integer] : TStringList read GetItem; default;
             Constructor Create();
+            destructor Destroy; override;
     end;
 
 var
@@ -42,22 +43,30 @@ begin
     Result := FTables[index].FSQLReq;
 end;
 
-procedure TSQLRequestList.NewItem(sqlpath: string);
+procedure TSQLRequestList.NewItem(const sqlpath: string);
 var
     NewSQLTable : TSQLRequest;
 begin
     NewSQLTable := TSQLRequest.Create(sqlpath);
     SetLength(FTables, Length(FTables) + 1);
-    FTables[
-    High(FTables)] := NewSQLTable;
+    FTables[High(FTables)] := NewSQLTable;
 end;
 
 constructor TSQLRequestList.Create();
 begin
 end;
 
+destructor TSQLRequestList.Destroy;
+var
+    i : integer;
+begin
+    for i := 0 to High(FTables) do begin
+        FTables[i].Free;
+    end;
+    inherited Destroy;
+end;
 
-constructor TSQLRequest.Create(sqlpath: string);
+constructor TSQLRequest.Create(const sqlpath: string);
 var
     s : string;
 begin
@@ -75,6 +84,12 @@ begin
     end;
 end;
 
+destructor TSQLRequest.Destroy;
+begin
+    FSQLReq.Free;
+    inherited Destroy;
+end;
+
 initialization
     SQLRequestList := TSQLRequestList.Create();
 
@@ -83,5 +98,8 @@ initialization
     SQLRequestList.NewItem('./sqls/teachers.sql');
     SQLRequestList.NewItem('./sqls/timelessons.sql');
     SQLRequestList.NewItem('./sqls/schedule.sql');
+
+finalization
+    SQLRequestList.Free;
 end.
 

@@ -52,9 +52,6 @@ type
         constructor Create(Component : TComponent); overload;
     end;
 
-var
-    RequestForm: TRequestForm;
-
 implementation
 
 {$R *.lfm}

@@ -37,6 +37,11 @@ initialization
     DataBase := TDataBase.Create();
     DataBase.IBConnection := TIBConnection.Create(nil);
     DataBase.SQLTransaction := TSQLTransaction.Create(nil);
+
+finalization
+    DataBase.IBConnection.Free;
+    DataBase.SQLTransaction.Free;
+    DataBase.Free;
 end.
 
 

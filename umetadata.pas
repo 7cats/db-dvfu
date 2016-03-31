@@ -201,5 +201,8 @@ initialization
         Metadata.AddTableColumn('TEACHER_ID', 'Преподаватель', 'TEACHERS', 'ID', ['Фамилия', 'Имя', 'Отчество'], 'ID');
         Metadata.AddTableColumn('GROUP_ID', 'Группа', 'GROUPS', 'ID', ['Группа'], 'ID');
         Metadata.AddTableColumn('CLASSROOM_ID', 'Аудитория', 'CLASSROOMS', 'ID', ['Аудитория'], 'ID');
+
+finalization
+    MetaData.Free;
  end.
 

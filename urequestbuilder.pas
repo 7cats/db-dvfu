@@ -52,6 +52,7 @@ type
 
     TRequestBuilder = class
         constructor Create();
+        destructor Destroy; override;
         procedure NewRequest(const TableCaption : string; const conditions : TVectorTriplet);
         procedure Initial();
         procedure GetReq(var SQLQuery : TSQLQuery);
@@ -133,6 +134,12 @@ constructor TRequestBuilder.Create;
 begin
     FRequest := TStringList.Create();
     Initial();
+end;
+
+destructor TRequestBuilder.Destroy;
+begin
+    FRequest.Free;
+    inherited Destroy;
 end;
 
 procedure TRequestBuilder.NewRequest(const TableCaption: string;
@@ -247,5 +254,7 @@ end;
 initialization
     RequestBuilder := TRequestBuilder.Create();
 
+finalization
+    RequestBuilder.Free;
 end.
 
