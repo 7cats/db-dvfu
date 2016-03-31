@@ -9,13 +9,51 @@ uses
 
 type
 
+    { TPairString }
+
+    TPairString = object
+        FTableName, FFieldName : ^string;
+        procedure MakePair(var first, second : string);
+    end;
+
+    { TVectorPairString }
+
+    TVectorPairString = object
+        private
+            function GetItem(index : integer) : TPairString;
+        public
+            FPairs : array of TPairString;
+            procedure PushBack(var first, second : string);
+            property Item[index : integer] : TPairString read GetItem; default;
+            function High_() : integer;
+    end;
+
+    { TTriplet }
+
+    TTriplet = object
+        FField, FOperation, FParam : ^string;
+        FIndexParam : integer;
+        procedure MakeTriplet(var Field, Operation, Param : string; index : integer);
+    end;
+
+    { TVectorTriplet }
+
+    TVectorTriplet = object
+        private
+            function GetItem(index : integer) : TTriplet;
+        public
+            FTriplets : array of TTriplet;
+            procedure PushBack(var Field, Operation, Param : string; index : integer);
+            property Item[index : integer] : TTriplet read GetItem; default;
+            function High_() : integer;
+    end;
+
     { TRequestBuilder }
 
     TRequestBuilder = class
         constructor Create();
-        procedure NewRequest(TableCaption : string);
+        procedure NewRequest(const TableCaption : string; const conditions : TVectorTriplet);
         procedure Initial();
-        procedure AddFilter(field, operation, Param : string);
         procedure GetReq(var SQLQuery : TSQLQuery);
         private
             FRequest : TStringList;
@@ -28,6 +66,67 @@ var
 
 implementation
 
+{ TVectorTriplet }
+
+procedure TVectorTriplet.PushBack(var Field, Operation, Param: string;
+    index: integer);
+var
+    tmp : TTriplet;
+begin
+    tmp.MakeTriplet(Field, Operation, Param, index);
+    SetLength(FTriplets, Length(FTriplets) + 1);
+    FTriplets[Self.High_()] := tmp;
+end;
+
+function TVectorTriplet.High_: integer;
+begin
+    result := High(FTriplets);
+end;
+
+function TVectorTriplet.GetItem(index: integer): TTriplet;
+begin
+    result := FTriplets[index];
+end;
+
+{ TVectorPairString }
+
+procedure TVectorPairString.PushBack(var first, second: string);
+var
+    tmp : TPairString;
+begin
+    tmp.MakePair(first, second);
+    SetLength(FPairs, Length(FPairs) + 1);
+    FPairs[High(FPairs)] := tmp;
+end;
+
+function TVectorPairString.High_: integer;
+begin
+    result := High(FPairs);
+end;
+
+function TVectorPairString.GetItem(index: integer): TPairString;
+begin
+    result := FPairs[index];
+end;
+
+{ TPairString }
+
+procedure TPairString.MakePair(var first, second: string);
+begin
+    FTableName := @first;
+    FFieldName := @second;
+end;
+
+{ TTriplet }
+
+procedure TTriplet.MakeTriplet(var Field, Operation, Param: string; index : integer);
+begin
+    FField := @Field;
+    FOperation := @Operation;
+    FParam := @Param;
+    FIndexParam := index;
+end;
+
 { TRequestBuilder }
 
 constructor TRequestBuilder.Create;
@@ -36,23 +135,93 @@ begin
     Initial();
 end;
 
-procedure TRequestBuilder.NewRequest(TableCaption: string);
+procedure TRequestBuilder.NewRequest(const TableCaption: string;
+    const conditions: TVectorTriplet);
 var
-    i : integer;
-    table : TMetaTable;
+    i, j, k : integer;
+    tableTmp : PMetaTable;
+    first : boolean = true;
+    ForeingFields : TVectorPairString;
+    PTable : PMetaTable;
 begin
     Initial();
     FRequest.Add('SELECT');
-    table := MetaData[TableCaption];
-    for i := 0 to table.CountOfColumns() - 1 do begin
-        with table.FColumnsNames[i] do begin
-            FRequest.Add(FDBName);
-            if (i <> table.CountOfColumns() - 1) then begin
-                FRequest.Add(',');
+
+    PTable :=  MetaData[TableCaption].GetAddr();
+
+    ShowMessage(PTable^.FCaption);
+    for i := 0 to PTable^.CountOfColumns() - 1 do begin
+
+            if (Length(PTable^[i].FForeignFields) > 0) then begin
+
+            j := 0; k := 0;
+            tableTmp := MetaData[PTable^[i].FRefTableName].GetAddr();
+            while (j <> Length(PTable^[i].FForeignFields)) do begin
+
+                if (PTable^[i].FForeignFields[j] = tableTmp^[k].FCaption) then begin
+
+                    ForeingFields.PushBack(PTable^.FColumns[i].FRefTableName, tableTmp^.FColumns[k].FDBName);
+                    if (not first) then begin
+                        FRequest.Add(',');
+                    end
+                    else begin
+                        first :=  false;
+                    end;
+
+                    FRequest.Add(PTable^[i].FRefTableName + '.' + tableTmp^[k].FDBName);
+                    inc(j);
+                end;
+
+                inc(k);
             end;
+
+        end
+        else begin
+
+            if (not first) then begin
+                FRequest.Add(',');
+            end
+            else begin
+                first :=  false;
+            end;
+            FRequest.Add(PTable^.FDBName + '.' + PTable^.FColumns[i].FDBName);
+            ForeingFields.PushBack(PTable^.FDBName, PTable^.FColumns[i].FDBName);
         end;
+
     end;
-    FRequest.Add('FROM ' + table.FTableName.FDBName);
+    FRequest.Add('FROM ' + PTable^.FDBName);
+
+    for i := 0 to PTable^.CountOfColumns() - 1 do begin
+
+         if (Length(PTable^[i].FForeignFields) > 0) then begin
+
+             FRequest.Add('INNER JOIN');
+             FRequest.Add(PTable^[i].FRefTableName + ' ON'
+                        + ' '  + PTable^[i].FRefTableName + '.' + PTable^[i].FForeignKey
+                        + '=' + PTable^.FDBName    + '.' + PTable^[i].FDBName);
+
+         end;
+    end;
+
+    first := true;
+    j := 0;
+    for i := 0 to conditions.High_() do begin
+        if (not first) then begin
+            FRequest.Add('AND');
+        end
+        else begin
+            FRequest.Add('WHERE');
+            first := false;
+        end;
+
+        FRequest.Add(ForeingFields[conditions[i].FIndexParam].FTableName^ + '.' + ForeingFields[conditions[i].FIndexParam].FFieldName^
+                    + conditions[i].FOperation^ + ':p' + IntToStr(j) );
+        SetLength(FParams, Length(FParams) + 1);
+        FParams[High(FParams)] := conditions[i].FParam^;
+
+    end;
+
+    FRequest.Add('ORDER BY ' + PTable^.FDBName + '.' + PTable^[0].FDBName);
 end;
 
 procedure TRequestBuilder.Initial;
@@ -60,25 +229,6 @@ begin
     FRequest.Clear;
     FirstFilter := true;
     SetLength(FParams, 0);
-end;
-
-procedure TRequestBuilder.AddFilter(field, operation, Param: string);
-begin
-    if (not FirstFilter) then begin
-        FRequest.Add('AND');
-    end
-    else begin
-        FirstFilter := false;
-    end;
-
-    FRequest.Add('WHERE');
-    FRequest.Add('Lower(' + field + ')');
-    FRequest.Add(Operation);
-
-    SetLength(FParams, Length(FParams) + 1);
-    FParams[High(FParams)] := Param;
-
-    FRequest.Add('Lower(' + ':p' + IntToStr(High(FParams)) + ')');
 end;
 
 procedure TRequestBuilder.GetReq(var SQLQuery : TSQLQuery);

@@ -5,8 +5,9 @@ unit UMain;
 interface
 
 uses
-    Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls,
-    Graphics, Dialogs, DBGrids, Menus, udb, urequestform;
+    Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls, Graphics,
+    Dialogs, DBGrids, Menus, StdCtrls, ExtCtrls, udb, urequestform,
+    urequestbuilder;
 
 type
 
@@ -39,7 +40,6 @@ implementation
 
 { TMainForm }
 
-
 procedure TMainForm.AbAutorItemClick(Sender: TObject);
 begin
     ShowMessage('Разумов Максим, Б8103а' + ''#13'' + 'https://github.com/7cats/db-dvfu-');
@@ -50,6 +50,8 @@ begin
     Application.Terminate;
 end;
 
+
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
     DataBase.Connect();
@@ -58,7 +60,7 @@ begin
     AddNewTableItem('LessonsItem', 'Предметы', 1);
     AddNewTableItem('TeachersItem', 'Преподаватели', 2);
     AddNewTableItem('LessonsTMItem', 'Время занятий', 3);
-//    AddNewTableItem('ScheduleItem', 'Расписание', 4);
+    AddNewTableItem('ScheduleItem', 'Расписание', 4);
 end;
 
 procedure TMainForm.ShowTableOnClick(Sender: TObject);
