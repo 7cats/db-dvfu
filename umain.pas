@@ -6,8 +6,7 @@ interface
 
 uses
     Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls, Graphics,
-    Dialogs, DBGrids, Menus, StdCtrls, ExtCtrls, udb, urequestform,
-    urequestbuilder;
+    Dialogs, DBGrids, Menus, ExtCtrls, udb, urequestform;
 
 type
 
