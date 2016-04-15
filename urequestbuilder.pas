@@ -79,16 +79,23 @@ begin
     FTriplets[Self.High_()] := tmp;
 end;
 
+{*****************************************************************************}
+
 function TVectorTriplet.High_: integer;
 begin
     result := High(FTriplets);
 end;
+
+{*****************************************************************************}
 
 function TVectorTriplet.GetItem(index: integer): TTriplet;
 begin
     Assert((0 <= index) and (index <= High(FTriplets)));
     result := FTriplets[index];
 end;
+
+{*****************************************************************************}
+
 
 { TVectorPairString }
 
@@ -101,16 +108,23 @@ begin
     FPairs[High(FPairs)] := tmp;
 end;
 
+{*****************************************************************************}
+
 function TVectorPairString.High_: integer;
 begin
     result := High(FPairs);
 end;
+
+{*****************************************************************************}
 
 function TVectorPairString.GetItem(index: integer): TPairString;
 begin
     Assert((0 <= index) and (index <= High(FPairs)));
     result := FPairs[index];
 end;
+
+{*****************************************************************************}
+
 
 { TPairString }
 
@@ -119,6 +133,9 @@ begin
     FTableName := @first;
     FFieldName := @second;
 end;
+
+{*****************************************************************************}
+
 
 { TTriplet }
 
@@ -131,6 +148,9 @@ begin
     FIndexParam := index;
 end;
 
+{*****************************************************************************}
+
+
 { TRequestBuilder }
 
 constructor TRequestBuilder.Create;
@@ -139,11 +159,15 @@ begin
     Initial();
 end;
 
+{*****************************************************************************}
+
 destructor TRequestBuilder.Destroy;
 begin
     FRequest.Free;
     inherited Destroy;
 end;
+
+{*****************************************************************************}
 
 procedure TRequestBuilder.NewRequest(const TableCaption: string;
     const conditions: TVectorTriplet);
@@ -234,12 +258,16 @@ begin
     FRequest.Add('ORDER BY ' + PTable^.FDBName + '.' + PTable^[0].FDBName);
 end;
 
+{*****************************************************************************}
+
 procedure TRequestBuilder.Initial;
 begin
     FRequest.Clear;
     FirstFilter := true;
     SetLength(FParams, 0);
 end;
+
+{*****************************************************************************}
 
 procedure TRequestBuilder.GetReq(var SQLQuery : TSQLQuery);
 var

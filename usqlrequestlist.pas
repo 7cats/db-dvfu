@@ -43,6 +43,8 @@ begin
     Result := FTables[index].FSQLReq;
 end;
 
+{*****************************************************************************}
+
 procedure TSQLRequestList.NewItem(const sqlpath: string);
 var
     NewSQLTable : TSQLRequest;
@@ -52,9 +54,13 @@ begin
     FTables[High(FTables)] := NewSQLTable;
 end;
 
+{*****************************************************************************}
+
 constructor TSQLRequestList.Create();
 begin
 end;
+
+{*****************************************************************************}
 
 destructor TSQLRequestList.Destroy;
 var
@@ -65,6 +71,8 @@ begin
     end;
     inherited Destroy;
 end;
+
+{*****************************************************************************}
 
 constructor TSQLRequest.Create(const sqlpath: string);
 var
@@ -84,11 +92,15 @@ begin
     end;
 end;
 
+{*****************************************************************************}
+
 destructor TSQLRequest.Destroy;
 begin
     FSQLReq.Free;
     inherited Destroy;
 end;
+
+{*****************************************************************************}
 
 initialization
     SQLRequestList := TSQLRequestList.Create();

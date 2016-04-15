@@ -66,11 +66,14 @@ begin
 
 end;
 
+{*****************************************************************************}
+
 procedure TRequestForm.GetResFilterBtnClick(Sender: TObject);
 begin
 
 end;
 
+{*****************************************************************************}
 
 procedure TRequestForm.NewFilterBtnMouseDown(Sender: TObject;
     Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -152,21 +155,29 @@ begin
 //    FFilters.Add(PTable);
 end;
 
+{*****************************************************************************}
+
 procedure TRequestForm.NewRequstBImageMouseUp(Sender: TObject;
     Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
 
 end;
 
+{*****************************************************************************}
+
 procedure TRequestForm.PlusFilterBtnClick(Sender: TObject);
 begin
 
 end;
 
+{*****************************************************************************}
+
 procedure TRequestForm.RemoveFilterMouseClick(Sender: TObject);
 begin
 
 end;
+
+{*****************************************************************************}
 
 procedure TRequestForm.UpdateWidthAndCaptionGrid;
 var
@@ -202,11 +213,15 @@ begin
     end;
 end;
 
+{*****************************************************************************}
+
 procedure TRequestForm.DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
     DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
     Column.Width := max(Column.Width ,10 + DBGrid.Canvas.TextExtent(Column.Field.DisplayText).cx);
 end;
+
+{*****************************************************************************}
 
 procedure TRequestForm.ShowTable(request: TStringList);
 begin
@@ -215,6 +230,8 @@ begin
     SQLQuery.Open;
     UpdateWidthAndCaptionGrid();
 end;
+
+{*****************************************************************************}
 
 procedure TRequestForm.ShowWithFilters;
 begin
@@ -225,6 +242,8 @@ begin
     SQLQuery.Open;
     UpdateWidthAndCaptionGrid();
 end;
+
+{*****************************************************************************}
 
 constructor TRequestForm.Create(Component: TComponent);
 begin
@@ -239,6 +258,7 @@ begin
     ShowTable(SQLRequestList[(Component as TMenuItem).Tag]);
 end;
 
+{*****************************************************************************}
 
 destructor TRequestForm.Destroy;
 begin

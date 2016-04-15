@@ -73,11 +73,15 @@ begin
     end;
 end;
 
+{*****************************************************************************}
+
 function TMetaTable.GetItem(const index: integer): TTableColumn;
 begin
     Assert((0 <= index) and (index <= High(FColumns)));
     result := FColumns[index];
 end;
+
+{*****************************************************************************}
 
 function TMetaTable.GetAddr: PMetaTable;
 begin
@@ -89,6 +93,9 @@ begin
     result := Length(FColumns);
 end;
 
+{*****************************************************************************}
+
+
 { TMetadata }
 
 function TMetaData.GetItem(const index: integer): TMetaTable;
@@ -96,6 +103,8 @@ begin
     Assert((0 <= index) and (index <= High(FTables)));
     result := FTables[index];
 end;
+
+{*****************************************************************************}
 
 function TMetaData.GetItem(const index: string): TMetaTable;
 var
@@ -111,6 +120,8 @@ begin
     Raise Exception.Create('Invailid table');
 end;
 
+{*****************************************************************************}
+
 function TMetaData.GetTableIndex(caption: string): integer;
 var
     i : integer;
@@ -123,12 +134,16 @@ begin
     Raise Exception.Create('Invalid column');
 end;
 
+{*****************************************************************************}
+
 procedure TMetaData.AddTable(const DBName, Caption: String);
 begin
     SetLength(FTables, Length(FTables) + 1);
     FTables[High(FTables)].FDBName := DBName;
     FTables[High(FTables)].FCaption := Caption;
 end;
+
+{*****************************************************************************}
 
 procedure TMetaData.AddTableColumn(const DBName, Caption: string);
 begin
@@ -140,6 +155,8 @@ begin
         FColumns[High(FColumns)].FRefTableName := '';
     end;
 end;
+
+{*****************************************************************************}
 
 procedure TMetaData.AddTableColumn(const DBName, Caption, RefTable,
     RefField: string; const outRTField: array of string;
@@ -159,14 +176,20 @@ begin
     end;
 end;
 
+{*****************************************************************************}
+
 function TMetaData.CountOfTables: integer;
 begin
     result := High(FTables);
 end;
 
+{*****************************************************************************}
+
 constructor TMetaData.Create;
 begin
 end;
+
+{*****************************************************************************}
 
 initialization
     MetaData := TMetaData.Create();
