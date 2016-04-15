@@ -31,9 +31,9 @@ type
     { TTriplet }
 
     TTriplet = object
-        FField, FOperation, FParam : ^string;
+        FField, FOperation, FParam : string;
         FIndexParam : integer;
-        procedure MakeTriplet(var Field, Operation, Param : string; index : integer);
+        procedure MakeTriplet(const Field, Operation, Param : string; index : integer);
     end;
 
     { TVectorTriplet }
@@ -86,6 +86,7 @@ end;
 
 function TVectorTriplet.GetItem(index: integer): TTriplet;
 begin
+    Assert((0 <= index) and (index <= High(FTriplets)));
     result := FTriplets[index];
 end;
 
@@ -107,6 +108,7 @@ end;
 
 function TVectorPairString.GetItem(index: integer): TPairString;
 begin
+    Assert((0 <= index) and (index <= High(FPairs)));
     result := FPairs[index];
 end;
 
@@ -120,11 +122,12 @@ end;
 
 { TTriplet }
 
-procedure TTriplet.MakeTriplet(var Field, Operation, Param: string; index : integer);
+procedure TTriplet.MakeTriplet(const Field, Operation, Param: string;
+    index: integer);
 begin
-    FField := @Field;
-    FOperation := @Operation;
-    FParam := @Param;
+    FField := Field;
+    FOperation := Operation;
+    FParam := Param;
     FIndexParam := index;
 end;
 
@@ -222,9 +225,9 @@ begin
         end;
 
         FRequest.Add(ForeingFields[conditions[i].FIndexParam].FTableName^ + '.' + ForeingFields[conditions[i].FIndexParam].FFieldName^
-                    + conditions[i].FOperation^ + ':p' + IntToStr(j) );
+                    + conditions[i].FOperation + ':p' + IntToStr(j) );
         SetLength(FParams, Length(FParams) + 1);
-        FParams[High(FParams)] := conditions[i].FParam^;
+        FParams[High(FParams)] := conditions[i].FParam;
 
     end;
 
