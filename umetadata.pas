@@ -40,6 +40,7 @@ type
             function GetItem(const index : string) : TMetaTable;
         public
             FTables: array of TMetaTable;
+            function GetTableIndex(caption : string) : integer;
             procedure AddTable(const DBName, Caption :String);
             procedure AddTableColumn(const DBName, Caption: string);
             procedure AddTableColumn(const DBName, Caption, RefTable, RefField: string;
@@ -74,6 +75,7 @@ end;
 
 function TMetaTable.GetItem(const index: integer): TTableColumn;
 begin
+    Assert((0 <= index) and (index <= High(FColumns)));
     result := FColumns[index];
 end;
 
@@ -91,12 +93,8 @@ end;
 
 function TMetaData.GetItem(const index: integer): TMetaTable;
 begin
-    if (index >= Length(FTables)) then begin
-        Raise Exception.Create('Ooooops!');
-    end
-    else begin
-        result := FTables[index];
-    end;
+    Assert((0 <= index) and (index <= High(FTables)));
+    result := FTables[index];
 end;
 
 function TMetaData.GetItem(const index: string): TMetaTable;
@@ -111,6 +109,18 @@ begin
         end;
     end;
     Raise Exception.Create('Invailid table');
+end;
+
+function TMetaData.GetTableIndex(caption: string): integer;
+var
+    i : integer;
+begin
+    for i := 0 to High(FTables) do begin
+        if (FTables[i].FCaption = caption) then begin
+            exit(i);
+        end;
+    end;
+    Raise Exception.Create('Invalid column');
 end;
 
 procedure TMetaData.AddTable(const DBName, Caption: String);
