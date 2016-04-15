@@ -1,11 +1,12 @@
 object RequestForm: TRequestForm
-  Left = 465
+  Left = 321
   Height = 674
-  Top = 142
+  Top = 105
   Width = 947
   Caption = 'RequestForm'
   ClientHeight = 674
   ClientWidth = 947
+  OnCreate = FormCreate
   LCLVersion = '1.6.0.4'
   object DBGrid: TDBGrid
     Left = 0
@@ -19,21 +20,23 @@ object RequestForm: TRequestForm
     TabOrder = 0
     OnDrawColumnCell = DBGridDrawColumnCell
   end
-  object BitBtn1: TBitBtn
-    Left = 24
-    Height = 30
-    Top = 392
-    Width = 75
+  object PlusFilterBtn: TButton
+    Left = 40
+    Height = 25
+    Top = 384
+    Width = 24
     Caption = '+'
+    OnClick = PlusFilterBtnClick
     TabOrder = 1
   end
-  object BitBtn2: TBitBtn
-    Left = 24
+  object GetResFilterBtn: TSpeedButton
+    Left = 16
     Height = 30
-    Top = 440
-    Width = 75
-    Caption = 'show'
-    TabOrder = 2
+    Top = 416
+    Width = 72
+    Caption = 'Применить'
+    Down = True
+    OnClick = GetResFilterBtnClick
   end
   object DataSource: TDataSource
     DataSet = SQLQuery
