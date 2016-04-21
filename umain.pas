@@ -85,30 +85,5 @@ begin
     ShowTableItem.Add(NewItem);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 end.
 

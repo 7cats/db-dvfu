@@ -57,8 +57,15 @@ end;
 {*****************************************************************************}
 
 procedure TRequestForm.AppllyFiltersBtnClick(Sender: TObject);
+var
+    filters : TVectorTriplet;
+    i : integer;
 begin
-
+    for i := 0 to High(FFilters) do begin
+        filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, FFilters[i].FSearchEdit.Text, FFilters[i].FFieldCB.ItemIndex);
+    end;
+    RequestBuilder.NewRequest(Self.Text, filters);
+    ShowWithFilters();
 end;
 
 {*****************************************************************************}
