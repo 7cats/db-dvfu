@@ -43,7 +43,7 @@ type
     TTriplet = object
         FField, FOperation, FParam : string;
         FIndexParam : integer;
-        procedure MakeTriplet(const Field, Operation, Param : string; index : integer);
+        procedure MakeTriplet(Field, Operation, Param : string; index : integer);
     end;
 
     { TVectorTriplet }
@@ -53,7 +53,7 @@ type
             function GetItem(index : integer) : TTriplet;
         public
             FTriplets : array of TTriplet;
-            procedure PushBack(var Field, Operation, Param : string; index : integer);
+            procedure PushBack(Field, Operation, Param : string; index : integer);
             property Item[index : integer] : TTriplet read GetItem; default;
             function High_() : integer;
     end;
@@ -86,12 +86,9 @@ begin
     inherited Destroy();
 end;
 
-
-
-
 { TVectorTriplet }
 
-procedure TVectorTriplet.PushBack(var Field, Operation, Param: string;
+procedure TVectorTriplet.PushBack(Field, Operation, Param: string;
     index: integer);
 var
     tmp : TTriplet;
@@ -161,8 +158,7 @@ end;
 
 { TTriplet }
 
-procedure TTriplet.MakeTriplet(const Field, Operation, Param: string;
-    index: integer);
+procedure TTriplet.MakeTriplet(Field, Operation, Param: string; index: integer);
 begin
     FField := Field;
     FOperation := Operation;
