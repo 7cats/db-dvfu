@@ -60,7 +60,6 @@ begin
 
     PTable :=  MetaData[TableCaption].GetAddr();
 
-    ShowMessage(PTable^.FCaption);
     for i := 0 to PTable^.CountOfColumns() - 1 do begin
 
             if (Length(PTable^[i].FForeignFields) > 0) then begin
@@ -126,10 +125,10 @@ begin
         end;
 
         FRequest.Add(ForeingFields[conditions[i].FIndexParam].FTableName^ + '.' + ForeingFields[conditions[i].FIndexParam].FFieldName^
-                    + conditions[i].FOperation + ':p' + IntToStr(j) );
+                   + conditions[i].FOperation + ':p' + IntToStr(j));
         SetLength(FParams, Length(FParams) + 1);
         FParams[High(FParams)] := conditions[i].FParam;
-
+        inc(j);
     end;
 
     FRequest.Add('ORDER BY ' + PTable^.FDBName + '.' + PTable^[0].FDBName);
