@@ -24,7 +24,7 @@ type
         procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
             DataCol: Integer; Column: TColumn; State: TGridDrawState);
         procedure FormCreate(Sender: TObject);
-        procedure AppllyFiltersBtnClick(Sender: TObject);
+        procedure ApplyFiltersBtnClick(Sender: TObject);
         procedure PlusFilterBtnClick(Sender: TObject);
         procedure PlusFilterBtnMouseDown(Sender: TObject; Button: TMouseButton;
             Shift: TShiftState; X, Y: Integer);
@@ -56,7 +56,7 @@ end;
 
 {*****************************************************************************}
 
-procedure TRequestForm.AppllyFiltersBtnClick(Sender: TObject);
+procedure TRequestForm.ApplyFiltersBtnClick(Sender: TObject);
 var
     filters : TVectorTriplet;
     i : integer;
@@ -138,8 +138,6 @@ var
     i : integer;
     tmp : TFilter;
 begin
-    ShowMessage( IntToStr((Sender as TButton).Tag) + ' ' +  IntToStr(High(FFilters) - 1));
-
     for i := (Sender as TButton).Tag to High(FFilters) - 1 do begin
         tmp := FFilters[i];
         FFilters[i] := FFilters[i + 1];
