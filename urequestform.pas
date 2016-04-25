@@ -16,17 +16,20 @@ type
     { TRequestForm }
 
     TRequestForm = class(TForm)
+        AddToTableBtn: TButton;
+        ChangeTableBtn: TButton;
+        EraseFTableBtn: TButton;
         PlusFilterBtn: TButton;
         DataSource: TDataSource;
         DBGrid: TDBGrid;
-        AppllyFiltersBtn: TSpeedButton;
         SQLQuery: TSQLQuery;
+        ApplyFiltersBtn: TToggleBox;
         procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
             DataCol: Integer; Column: TColumn; State: TGridDrawState);
         procedure FormCreate(Sender: TObject);
         procedure ApplyFiltersBtnClick(Sender: TObject);
         procedure PlusFilterBtnClick(Sender: TObject);
-        procedure PlusFilterBtnMouseDown(Sender: TObject; Button: TMouseButton;
+        procedure RemoveFilterBtnMouseDown(Sender: TObject; Button: TMouseButton;
             Shift: TShiftState; X, Y: Integer);
         procedure UpdateWidthAndCaptionGrid();
         private
@@ -61,11 +64,21 @@ var
     filters : TVectorTriplet;
     i : integer;
 begin
-    for i := 0 to High(FFilters) do begin
-        filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, FFilters[i].FSearchEdit.Text, FFilters[i].FFieldCB.ItemIndex);
+    try
+        for i := 0 to High(FFilters) do begin
+            if (FFilters[i].FOperationCB.Text = 'Like') then begin
+                filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, '%' + FFilters[i].FSearchEdit.Text + '%', FFilters[i].FFieldCB.ItemIndex);
+            end
+            else begin
+                filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, FFilters[i].FSearchEdit.Text, FFilters[i].FFieldCB.ItemIndex);
+            end;
+        end;
+        RequestBuilder.NewRequest(Self.Text, filters);
+        ShowWithFilters();
+    except
+        ShowMessage('Введите корректно данные');
+        ApplyFiltersBtn.State := cbUnchecked;
     end;
-    RequestBuilder.NewRequest(Self.Text, filters);
-    ShowWithFilters();
 end;
 
 {*****************************************************************************}
@@ -85,7 +98,6 @@ begin
     FieldCB.Left := X;
     FieldCB.Parent := Self;
     FieldCB.ReadOnly := True;
-    //FieldCB.OnChange := @ChangeParamsCB;
 
     X += FieldCB.Width + space;
 
@@ -105,12 +117,10 @@ begin
     OperationCB.AddItem(' >= ', OperationCB);
     OperationCB.AddItem(' = ', OperationCB);
     OperationCB.AddItem(' Like ', OperationCB);
-    //FOperationCB.OnChange := @ChangeParamsCmbBox;
 
     X += OperationCB.Width + space;
 
     SearchEdit := TEdit.Create(nil);
-//      SearchEdit.OnChange := @ChangeParamsTEdit;
     SearchEdit.Parent := Self;
     SearchEdit.Top := Y;
     SearchEdit.Left := X;
@@ -120,7 +130,7 @@ begin
     CloseIm := TButton.Create(Self);
     CloseIm.Parent := Self;
     CloseIm.Caption := 'X';
-    CloseIm.OnMouseDown := @PlusFilterBtnMouseDown;
+    CloseIm.OnMouseDown := @RemoveFilterBtnMouseDown;
     CloseIm.Top := Y;
     CloseIm.Left := X;
 
@@ -128,11 +138,12 @@ begin
 
     FCurrNewFilterPoint.Y += FieldCB.Height + space;
 
+    ApplyFiltersBtn.State := cbUnchecked;
 end;
 
 {*****************************************************************************}
 
-procedure TRequestForm.PlusFilterBtnMouseDown(Sender: TObject;
+procedure TRequestForm.RemoveFilterBtnMouseDown(Sender: TObject;
     Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
     i : integer;
@@ -147,6 +158,8 @@ begin
     end;
 
     FCurrNewFilterPoint.Y -= (FFilters[High(FFilters)].FFieldCB.Height + space);
+
+    ApplyFiltersBtn.Checked := false;
     FiltersPopBack();
 end;
 
@@ -225,6 +238,8 @@ begin
     FFilters[High(FFilters)] := filter;
 end;
 
+{*****************************************************************************}
+
 procedure TRequestForm.NewPos(filter: TFilter);
 begin
     with filter do begin
@@ -234,6 +249,8 @@ begin
         FCloseItem.Top := FCloseItem.Top - (FCloseItem.Height + space_btn);
     end;
 end;
+
+{*****************************************************************************}
 
 procedure TRequestForm.FiltersPopBack;
 begin

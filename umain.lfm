@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 675
+  Left = 485
   Height = 650
-  Top = 703
+  Top = 121
   Width = 950
   Caption = 'Main'
   Menu = MainMenu

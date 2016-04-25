@@ -1,18 +1,18 @@
 object RequestForm: TRequestForm
-  Left = 321
+  Left = 553
   Height = 674
-  Top = 105
-  Width = 947
-  Caption = 'RequestForm'
+  Top = 154
+  Width = 941
+  Caption = 'Применить'
   ClientHeight = 674
-  ClientWidth = 947
+  ClientWidth = 941
   OnCreate = FormCreate
   LCLVersion = '1.6.0.4'
   object DBGrid: TDBGrid
     Left = 0
     Height = 368
     Top = 0
-    Width = 947
+    Width = 941
     Align = alTop
     Color = clWindow
     Columns = <>
@@ -29,13 +29,38 @@ object RequestForm: TRequestForm
     OnClick = PlusFilterBtnClick
     TabOrder = 1
   end
-  object AppllyFiltersBtn: TSpeedButton
+  object ApplyFiltersBtn: TToggleBox
     Left = 16
-    Height = 30
+    Height = 32
     Top = 416
     Width = 72
     Caption = 'Применить'
-    OnClick = AppllyFiltersBtnClick
+    OnClick = ApplyFiltersBtnClick
+    TabOrder = 2
+  end
+  object AddToTableBtn: TButton
+    Left = 16
+    Height = 25
+    Top = 552
+    Width = 75
+    Caption = 'Добавить'
+    TabOrder = 3
+  end
+  object ChangeTableBtn: TButton
+    Left = 16
+    Height = 25
+    Top = 592
+    Width = 75
+    Caption = 'Изменить'
+    TabOrder = 4
+  end
+  object EraseFTableBtn: TButton
+    Left = 16
+    Height = 25
+    Top = 632
+    Width = 75
+    Caption = 'Удалить'
+    TabOrder = 5
   end
   object DataSource: TDataSource
     DataSet = SQLQuery
