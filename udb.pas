@@ -25,7 +25,7 @@ begin
         IBConnection.Password := 'masterkey';
         IBConnection.CharSet:='UTF8';
         IBConnection.UserName := 'SYSDBA';
-        IBConnection.DatabaseName := '../MY.FDB';
+        IBConnection.DatabaseName := './db/MY.FDB';
         IBConnection.Transaction := DataBase.SQLTransaction;
         SQLTransaction.DataBase := IBConnection;
     except
