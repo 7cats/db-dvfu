@@ -7,7 +7,7 @@ interface
 uses
     Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
     DBGrids, udb, menus, StdCtrls, Buttons, ExtCtrls, usqlrequestlist, umetadata,
-    urequestbuilder, Grids, math, utility;
+    urequestbuilder, Grids, math, utility, ueditform;
 const
     space = 10;
     space_btn = 8;
@@ -24,6 +24,7 @@ type
         DBGrid: TDBGrid;
         SQLQuery: TSQLQuery;
         ApplyFiltersBtn: TToggleBox;
+        procedure ChangeTableBtnClick(Sender : TObject);
         procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
             DataCol: Integer; Column: TColumn; State: TGridDrawState);
         procedure FormCreate(Sender: TObject);
@@ -36,6 +37,7 @@ type
             PTable : PMetaTable;
             FCurrNewFilterPoint : TPoint;
             FFilters : array of TFilter;
+            CellIndex : integer;
             procedure ShowTable(request : TStringList);
             procedure ShowWithFilters();
             procedure FilterAdd(filter : TFilter);
@@ -57,7 +59,6 @@ begin
     FCurrNewFilterPoint := Point(PlusFilterBtn.Left +  3 * PlusFilterBtn.Width ,PlusFilterBtn.Top);
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.ApplyFiltersBtnClick(Sender: TObject);
 var
@@ -81,7 +82,6 @@ begin
     end;
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.PlusFilterBtnClick(Sender: TObject);
 var
@@ -141,7 +141,6 @@ begin
     ApplyFiltersBtn.State := cbUnchecked;
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.RemoveFilterBtnMouseDown(Sender: TObject;
     Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -163,7 +162,6 @@ begin
     FiltersPopBack();
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.UpdateWidthAndCaptionGrid;
 var
@@ -171,35 +169,25 @@ var
 begin
     col_grid := 0;
     for i := 0 to PTable^.CountOfColumns() - 1 do begin
-
         if (Length(PTable^[i].FForeignFields) > 0) then begin
-
             for j := 0 to High((PTable^[i].FForeignFields)) do begin
-
-                    with DBGrid.Columns[col_grid] do begin
-
-                        Title.Caption := PTable^[i].FForeignFields[j];
-                        Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
-                        inc(col_grid);
-
-                    end;
+                with DBGrid.Columns[col_grid] do begin
+                    Title.Caption := PTable^[i].FForeignFields[j];
+                    Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
+                    inc(col_grid);
+                end;
             end;
         end
         else begin
-
            with  DBGrid.Columns[col_grid] do begin
-
                Title.Caption := PTable^[i].FCaption;
                Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
-
            end;
-
            inc(col_grid);
         end;
     end;
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
     DataCol: Integer; Column: TColumn; State: TGridDrawState);
@@ -207,7 +195,12 @@ begin
     Column.Width := max(Column.Width ,space + DBGrid.Canvas.TextExtent(Column.Field.DisplayText).cx);
 end;
 
-{*****************************************************************************}
+
+procedure TRequestForm.ChangeTableBtnClick(Sender : TObject);
+begin
+    TEditForm.CreateNew(Sender as TButton, Self.Caption);
+end;
+
 
 procedure TRequestForm.ShowTable(request: TStringList);
 begin
@@ -217,7 +210,6 @@ begin
     UpdateWidthAndCaptionGrid();
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.ShowWithFilters;
 begin
@@ -229,7 +221,6 @@ begin
     UpdateWidthAndCaptionGrid();
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.FilterAdd(filter: TFilter);
 begin
@@ -238,7 +229,6 @@ begin
     FFilters[High(FFilters)] := filter;
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.NewPos(filter: TFilter);
 begin
@@ -250,7 +240,6 @@ begin
     end;
 end;
 
-{*****************************************************************************}
 
 procedure TRequestForm.FiltersPopBack;
 begin
@@ -258,7 +247,6 @@ begin
     SetLength(FFilters, High(FFilters));
 end;
 
-{*****************************************************************************}
 
 constructor TRequestForm.Create(Component: TComponent);
 begin
@@ -273,7 +261,6 @@ begin
     ShowTable(SQLRequestList[(Component as TMenuItem).Tag]);
 end;
 
-{*****************************************************************************}
 
 destructor TRequestForm.Destroy;
 var

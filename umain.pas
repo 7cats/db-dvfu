@@ -44,14 +44,12 @@ begin
     ShowMessage('Разумов Максим, Б8103а' + ''#13'' + 'https://github.com/7cats/db-dvfu-');
 end;
 
-{*****************************************************************************}
 
 procedure TMainForm.ExitItemClick(Sender: TObject);
 begin
     Application.Terminate;
 end;
 
-{*****************************************************************************}
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
@@ -64,14 +62,12 @@ begin
     AddNewTableItem('ScheduleItem', 'Расписание', 4);
 end;
 
-{*****************************************************************************}
 
 procedure TMainForm.ShowTableOnClick(Sender: TObject);
 begin
     TRequestForm.Create(Sender as TMenuItem);
 end;
 
-{*****************************************************************************}
 
 procedure TMainForm.AddNewTableItem(nameI, captionI: string; index: integer);
 var

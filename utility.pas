@@ -71,7 +71,6 @@ begin
     FCloseItem := closeItem;
 end;
 
-{*****************************************************************************}
 
 destructor TFilter.Destroy;
 begin
@@ -98,22 +97,18 @@ begin
     FTriplets[Self.High_()] := tmp;
 end;
 
-{*****************************************************************************}
 
 function TVectorTriplet.High_: integer;
 begin
     result := High(FTriplets);
 end;
 
-{*****************************************************************************}
 
 function TVectorTriplet.GetItem(index: integer): TTriplet;
 begin
     Assert((0 <= index) and (index <= High(FTriplets)));
     result := FTriplets[index];
 end;
-
-{*****************************************************************************}
 
 
 { TVectorPairString }
@@ -127,14 +122,12 @@ begin
     FPairs[High(FPairs)] := tmp;
 end;
 
-{*****************************************************************************}
 
 function TVectorPairString.High_: integer;
 begin
     result := High(FPairs);
 end;
 
-{*****************************************************************************}
 
 function TVectorPairString.GetItem(index: integer): TPairString;
 begin
@@ -142,7 +135,6 @@ begin
     result := FPairs[index];
 end;
 
-{*****************************************************************************}
 
 
 { TPairString }
@@ -152,8 +144,6 @@ begin
     FTableName := @first;
     FFieldName := @second;
 end;
-
-{*****************************************************************************}
 
 
 { TTriplet }
@@ -165,8 +155,6 @@ begin
     FParam := Param;
     FIndexParam := index;
 end;
-
-
 
 end.
 
