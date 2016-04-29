@@ -11,7 +11,7 @@ type
 
     { TSQLRequest }
 
-    TSQLRequest = class
+   TSQLRequest = class
         private
             FSQLReq : TStringList;
         public

@@ -36,12 +36,12 @@ type
         private
             PTable : PMetaTable;
             FCurrNewFilterPoint : TPoint;
-            FFilters : array of TFilter;
+            FFilters : array of TFilterComponent;
             CellIndex : integer;
             procedure ShowTable(request : TStringList);
             procedure ShowWithFilters();
-            procedure FilterAdd(filter : TFilter);
-            procedure NewPos(filter : TFilter);
+            procedure FilterAdd(filter : TFilterComponent);
+            procedure NewPos(filter : TFilterComponent);
             procedure FiltersPopBack();
         public
             constructor Create(Component : TComponent); overload;
@@ -62,7 +62,7 @@ end;
 
 procedure TRequestForm.ApplyFiltersBtnClick(Sender: TObject);
 var
-    filters : TVectorTriplet;
+    filters : TVectorConditions;
     i : integer;
 begin
     try
@@ -134,7 +134,7 @@ begin
     CloseIm.Top := Y;
     CloseIm.Left := X;
 
-    FilterAdd(TFilter.Create(FieldCB, OperationCB, SearchEdit, CloseIm));
+    FilterAdd(TFilterComponent.Create(FieldCB, OperationCB, SearchEdit, CloseIm));
 
     FCurrNewFilterPoint.Y += FieldCB.Height + space;
 
@@ -146,7 +146,7 @@ procedure TRequestForm.RemoveFilterBtnMouseDown(Sender: TObject;
     Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
     i : integer;
-    tmp : TFilter;
+    tmp : TFilterComponent;
 begin
     for i := (Sender as TButton).Tag to High(FFilters) - 1 do begin
         tmp := FFilters[i];
@@ -222,7 +222,7 @@ begin
 end;
 
 
-procedure TRequestForm.FilterAdd(filter: TFilter);
+procedure TRequestForm.FilterAdd(filter: TFilterComponent);
 begin
     SetLength(FFilters, Length(FFilters) + 1);
     filter.FCloseItem.Tag := High(FFilters);
@@ -230,7 +230,7 @@ begin
 end;
 
 
-procedure TRequestForm.NewPos(filter: TFilter);
+procedure TRequestForm.NewPos(filter: TFilterComponent);
 begin
     with filter do begin
         FFieldCB.Top := FFieldCB.Top - (FFieldCB.Height + space);

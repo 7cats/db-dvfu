@@ -1,7 +1,7 @@
 object RequestForm: TRequestForm
-  Left = 553
+  Left = 317
   Height = 674
-  Top = 154
+  Top = 62
   Width = 941
   Caption = 'Применить'
   ClientHeight = 674
@@ -44,6 +44,7 @@ object RequestForm: TRequestForm
     Top = 552
     Width = 75
     Caption = 'Добавить'
+    OnClick = ChangeTableBtnClick
     TabOrder = 3
   end
   object ChangeTableBtn: TButton
@@ -52,6 +53,7 @@ object RequestForm: TRequestForm
     Top = 592
     Width = 75
     Caption = 'Изменить'
+    OnClick = ChangeTableBtnClick
     TabOrder = 4
   end
   object EraseFTableBtn: TButton

@@ -11,7 +11,7 @@ type
 
     { TFilter }
 
-    TFilter = class
+    TFilterComponent = class
         FFieldCB, FOperationCB : TComboBox;
         FSearchEdit : TEdit;
         FCloseItem : TButton;
@@ -38,31 +38,31 @@ type
             function High_() : integer;
     end;
 
-    { TTriplet }
+    { TCondition }
 
-    TTriplet = object
+    TCondition = object
         FField, FOperation, FParam : string;
         FIndexParam : integer;
         procedure MakeTriplet(Field, Operation, Param : string; index : integer);
     end;
 
-    { TVectorTriplet }
+    { TVectorConditions }
 
-    TVectorTriplet = object
+    TVectorConditions = object
         private
-            function GetItem(index : integer) : TTriplet;
+            function GetItem(index : integer) : TCondition;
         public
-            FTriplets : array of TTriplet;
+            FTriplets : array of TCondition;
             procedure PushBack(Field, Operation, Param : string; index : integer);
-            property Item[index : integer] : TTriplet read GetItem; default;
+            property Item[index : integer] : TCondition read GetItem; default;
             function High_() : integer;
     end;
 
 implementation
 
-{ TFilter }
+{ TCondition }
 
-constructor TFilter.Create(fieldCB, operationCB: TComboBox; searchEdit: TEdit;
+constructor TFilterComponent.Create(fieldCB, operationCB: TComboBox; searchEdit: TEdit;
     closeItem: TButton);
 begin
     FFieldCB := fieldCB;
@@ -72,7 +72,7 @@ begin
 end;
 
 
-destructor TFilter.Destroy;
+destructor TFilterComponent.Destroy;
 begin
     FFieldCB.Hide;
     FFieldCB.Free;
@@ -85,12 +85,12 @@ begin
     inherited Destroy();
 end;
 
-{ TVectorTriplet }
+{ TVectorConditions }
 
-procedure TVectorTriplet.PushBack(Field, Operation, Param: string;
+procedure TVectorConditions.PushBack(Field, Operation, Param: string;
     index: integer);
 var
-    tmp : TTriplet;
+    tmp : TCondition;
 begin
     tmp.MakeTriplet(Field, Operation, Param, index);
     SetLength(FTriplets, Length(FTriplets) + 1);
@@ -98,13 +98,13 @@ begin
 end;
 
 
-function TVectorTriplet.High_: integer;
+function TVectorConditions.High_: integer;
 begin
     result := High(FTriplets);
 end;
 
 
-function TVectorTriplet.GetItem(index: integer): TTriplet;
+function TVectorConditions.GetItem(index: integer): TCondition;
 begin
     Assert((0 <= index) and (index <= High(FTriplets)));
     result := FTriplets[index];
@@ -146,9 +146,9 @@ begin
 end;
 
 
-{ TTriplet }
+{ TCondition }
 
-procedure TTriplet.MakeTriplet(Field, Operation, Param: string; index: integer);
+procedure TCondition.MakeTriplet(Field, Operation, Param: string; index: integer);
 begin
     FField := Field;
     FOperation := Operation;

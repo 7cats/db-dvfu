@@ -14,8 +14,9 @@ type
     TRequestBuilder = class
         constructor Create();
         destructor Destroy; override;
-        procedure NewRequest(const TableCaption : string; const conditions : TVectorTriplet);
+        procedure NewRequest(const TableCaption : string; const conditions : TVectorConditions);
         procedure Initial();
+        procedure AddToRequest(var isFirst : boolean; toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
         procedure GetReq(var SQLQuery : TSQLQuery);
         private
             FRequest : TStringList;
@@ -45,11 +46,11 @@ end;
 
 
 procedure TRequestBuilder.NewRequest(const TableCaption: string;
-    const conditions: TVectorTriplet);
+    const conditions: TVectorConditions);
 var
     i, j, k : integer;
     tableTmp : PMetaTable;
-    first : boolean = true;
+    isFirst : boolean = true;
     ForeingFields : TVectorPairString;
     PTable : PMetaTable;
 begin
@@ -57,58 +58,45 @@ begin
     FRequest.Add('SELECT');
 
     PTable :=  MetaData[TableCaption].GetAddr();
-
     for i := 0 to PTable^.CountOfColumns() - 1 do begin
-        if (Length(PTable^[i].FForeignFields) > 0) then begin
-            j := 0; k := 0;
-            tableTmp := MetaData[PTable^[i].FRefTableName].GetAddr();
-            while (j <> Length(PTable^[i].FForeignFields)) do begin
-                if (PTable^[i].FForeignFields[j] = tableTmp^[k].FCaption) then begin
-                    ForeingFields.PushBack(PTable^.FColumns[i].FRefTableName, tableTmp^.FColumns[k].FDBName);
-                    if (not first) then begin
-                        FRequest.Add(',');
-                    end
-                    else begin
-                        first :=  false;
+        with PTable^[i] do begin
+            if (Length(PTable^[i].FForeignFields) > 0) then begin
+                j := 0; k := 0;
+                tableTmp := MetaData[FRefTableName].GetAddr();
+                while (j <> Length(PTable^[i].FForeignFields)) do begin
+                    if (PTable^[i].FForeignFields[j] = tableTmp^[k].FCaption) then begin
+                        ForeingFields.PushBack(PTable^.FColumns[i].FRefTableName, tableTmp^.FColumns[k].FDBName);
+                        AddToRequest(isFirst, PTable^[i].FRefTableName + '.' + tableTmp^[k].FDBName, ',', '');
+                        inc(j);
                     end;
-                    FRequest.Add(PTable^[i].FRefTableName + '.' + tableTmp^[k].FDBName);
-                    inc(j);
+                    inc(k);
                 end;
-                inc(k);
-            end;
-        end
-        else begin
-            if (not first) then begin
-                FRequest.Add(',');
             end
             else begin
-                first :=  false;
+                AddToRequest(isFirst, PTable^.FDBName + '.' + PTable^.FColumns[i].FDBName, ',', '');
+                ForeingFields.PushBack(PTable^.FDBName, PTable^.FColumns[i].FDBName);
             end;
-            FRequest.Add(PTable^.FDBName + '.' + PTable^.FColumns[i].FDBName);
-            ForeingFields.PushBack(PTable^.FDBName, PTable^.FColumns[i].FDBName);
         end;
     end;
+
     FRequest.Add('FROM ' + PTable^.FDBName);
+
     for i := 0 to PTable^.CountOfColumns() - 1 do begin
-         if (Length(PTable^[i].FForeignFields) > 0) then begin
-             FRequest.Add('INNER JOIN');
-             FRequest.Add(PTable^[i].FRefTableName + ' ON'
-                        + ' '  + PTable^[i].FRefTableName + '.' + PTable^[i].FForeignKey
-                        + '=' + PTable^.FDBName    + '.' + PTable^[i].FDBName);
-         end;
+        with PTable^[i] do begin
+            if (Length(FForeignFields) > 0) then begin
+                FRequest.Add('INNER JOIN' + FRefTableName + ' ON'
+                            + ' '  + FRefTableName + '.' + FForeignKey
+                            + '='  + PTable^.FDBName       + '.' + PTable^.FDBName);
+            end;
+        end;
     end;
-    first := true;
+    isFirst := true;
     j := 0;
     for i := 0 to conditions.High_() do begin
-        if (not first) then begin
-            FRequest.Add('AND');
-        end
-        else begin
-            FRequest.Add('WHERE');
-            first := false;
+        with ForeingFields[conditions[i].FIndexParam] do begin
+            AddToRequest(isFirst, FTableName^ + '.' + FFieldName^
+                   + conditions[i].FOperation + ':p' + IntToStr(j), 'AND', 'WHERE');
         end;
-        FRequest.Add(ForeingFields[conditions[i].FIndexParam].FTableName^ + '.' + ForeingFields[conditions[i].FIndexParam].FFieldName^
-                   + conditions[i].FOperation + ':p' + IntToStr(j));
         SetLength(FParams, Length(FParams) + 1);
         FParams[High(FParams)] := conditions[i].FParam;
         inc(j);
@@ -123,6 +111,19 @@ begin
     FRequest.Clear;
     FirstFilter := true;
     SetLength(FParams, 0);
+end;
+
+procedure TRequestBuilder.AddToRequest(var isFirst : boolean;
+    toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
+begin
+    if (not isFirst) then begin
+        FRequest.Add(addIfFirstTrue);
+    end
+    else begin
+        FRequest.Add(addIfFirstFalse);
+        isFirst :=  false;
+    end;
+    FRequest.Add(toAddToRequest);
 end;
 
 
