@@ -6,8 +6,8 @@ interface
 
 uses
     Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
-    DBGrids, udb, menus, StdCtrls, Buttons, ExtCtrls, usqlrequestlist, umetadata,
-    urequestbuilder, Grids, math, ucondition, ueditform;
+    DBGrids, udb, menus, StdCtrls, Buttons, ExtCtrls, umetadata, urequestbuilder,
+    Grids, math, ucondition, ueditform;
 const
     space = 10;
     space_btn = 8;
@@ -38,7 +38,6 @@ type
             FCurrNewFilterPoint : TPoint;
             FFilters : array of TFilterComponent;
             CellIndex : integer;
-            procedure ShowTable(request : TStringList);
             procedure ShowWithFilters();
             procedure FilterAdd(filter : TFilterComponent);
             procedure NewPos(filter : TFilterComponent);
@@ -202,15 +201,6 @@ begin
 end;
 
 
-procedure TRequestForm.ShowTable(request: TStringList);
-begin
-    SQLQuery.Close;
-    SQLQuery.SQL := request;
-    SQLQuery.Open;
-    UpdateWidthAndCaptionGrid();
-end;
-
-
 procedure TRequestForm.ShowWithFilters;
 begin
     SQLQuery.Close;
@@ -249,6 +239,8 @@ end;
 
 
 constructor TRequestForm.Create(Component: TComponent);
+var
+    emptyConditions : TVectorConditions;
 begin
     inherited Create(Component);
     Caption := (Component as TMenuItem).Caption;
@@ -258,7 +250,9 @@ begin
 
     SQLQuery.Transaction := DataBase.SQLTransaction;
     SQLQuery.DataBase := DataBase.IBConnection;
-    ShowTable(SQLRequestList[(Component as TMenuItem).Tag]);
+
+    RequestBuilder.NewRequest(Self.Text, emptyConditions);
+    ShowWithFilters();
 end;
 
 

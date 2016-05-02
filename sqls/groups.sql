@@ -1,2 +1,0 @@
-SELECT g.ID, g.NAME
-  FROM GROUPS g
