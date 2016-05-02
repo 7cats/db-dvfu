@@ -7,7 +7,7 @@ interface
 uses
     Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
     DBGrids, udb, menus, StdCtrls, Buttons, ExtCtrls, usqlrequestlist, umetadata,
-    urequestbuilder, Grids, math, utility, ueditform;
+    urequestbuilder, Grids, math, ucondition, ueditform;
 const
     space = 10;
     space_btn = 8;

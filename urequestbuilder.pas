@@ -5,7 +5,7 @@ unit urequestbuilder;
 interface
 
 uses
-    Classes, SysUtils, umetadata, dialogs, sqldb, utility;
+    Classes, SysUtils, umetadata, dialogs, sqldb, ucondition;
 
 type
 

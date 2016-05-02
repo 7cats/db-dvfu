@@ -1,4 +1,4 @@
-unit utility;
+unit ucondition;
 
 {$mode objfpc}{$H+}
 
