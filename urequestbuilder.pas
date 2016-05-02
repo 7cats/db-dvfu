@@ -16,7 +16,6 @@ type
         destructor Destroy; override;
         procedure NewRequest(const TableCaption : string; const conditions : TVectorConditions);
         procedure Initial();
-        procedure AddToRequest(var isFirst : boolean; toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
         procedure GetReq(var SQLQuery : TSQLQuery);
         private
             FRequest : TStringList;
@@ -53,6 +52,19 @@ var
     isFirst : boolean = true;
     ForeingFields : TVectorPairString;
     PTable : PMetaTable;
+
+    procedure AddToRequest(toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
+    begin
+        if (not isFirst) then begin
+            FRequest.Add(addIfFirstTrue);
+        end
+        else begin
+            FRequest.Add(addIfFirstFalse);
+            isFirst :=  false;
+        end;
+        FRequest.Add(toAddToRequest);
+    end;
+
 begin
     Initial();
     FRequest.Add('SELECT');
@@ -66,14 +78,14 @@ begin
                 while (j <> Length(PTable^[i].FForeignFields)) do begin
                     if (PTable^[i].FForeignFields[j] = tableTmp^[k].FCaption) then begin
                         ForeingFields.PushBack(PTable^.FColumns[i].FRefTableName, tableTmp^.FColumns[k].FDBName);
-                        AddToRequest(isFirst, PTable^[i].FRefTableName + '.' + tableTmp^[k].FDBName, ',', '');
+                        AddToRequest(PTable^[i].FRefTableName + '.' + tableTmp^[k].FDBName, ',', '');
                         inc(j);
                     end;
                     inc(k);
                 end;
             end
             else begin
-                AddToRequest(isFirst, PTable^.FDBName + '.' + PTable^.FColumns[i].FDBName, ',', '');
+                AddToRequest(PTable^.FDBName + '.' + PTable^.FColumns[i].FDBName, ',', '');
                 ForeingFields.PushBack(PTable^.FDBName, PTable^.FColumns[i].FDBName);
             end;
         end;
@@ -94,7 +106,7 @@ begin
     j := 0;
     for i := 0 to conditions.High_() do begin
         with ForeingFields[conditions[i].FIndexParam] do begin
-            AddToRequest(isFirst, FTableName^ + '.' + FFieldName^
+            AddToRequest(FTableName^ + '.' + FFieldName^
                    + conditions[i].FOperation + ':p' + IntToStr(j), 'AND', 'WHERE');
         end;
         SetLength(FParams, Length(FParams) + 1);
@@ -111,19 +123,6 @@ begin
     FRequest.Clear;
     FirstFilter := true;
     SetLength(FParams, 0);
-end;
-
-procedure TRequestBuilder.AddToRequest(var isFirst : boolean;
-    toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
-begin
-    if (not isFirst) then begin
-        FRequest.Add(addIfFirstTrue);
-    end
-    else begin
-        FRequest.Add(addIfFirstFalse);
-        isFirst :=  false;
-    end;
-    FRequest.Add(toAddToRequest);
 end;
 
 
