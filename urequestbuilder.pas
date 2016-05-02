@@ -96,9 +96,7 @@ begin
     for i := 0 to PTable^.CountOfColumns() - 1 do begin
         with PTable^[i] do begin
             if (Length(FForeignFields) > 0) then begin
-                FRequest.Add('INNER JOIN' + FRefTableName + ' ON'
-                            + ' '  + FRefTableName + '.' + FForeignKey
-                            + '='  + PTable^.FDBName       + '.' + PTable^.FDBName);
+                FRequest.Add('INNER JOIN ' + FRefTableName + ' ON' + ' '  + FRefTableName   + '.' + FForeignKey + '='  + PTable^.FDBName + '.' + FDBName);
             end;
         end;
     end;
