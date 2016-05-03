@@ -65,7 +65,7 @@ end;
 
 procedure TMainForm.ShowTableOnClick(Sender: TObject);
 begin
-    TRequestForm.Create(Sender as TMenuItem);
+    TRequestForm.Create(Sender as TMenuItem).Show();
 end;
 
 

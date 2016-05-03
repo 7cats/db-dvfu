@@ -197,7 +197,7 @@ end;
 
 procedure TRequestForm.ChangeTableBtnClick(Sender : TObject);
 begin
-    TEditForm.CreateNew(Sender as TButton, Self.Caption);
+    TEditForm.Create(Sender as TButton, Self.Caption).Show();
 end;
 
 
@@ -246,7 +246,6 @@ begin
     Caption := (Component as TMenuItem).Caption;
 
     Table := MetaData.FTables[MetaData.GetTableIndex(caption)];
-    Self.Show();
 
     SQLQuery.Transaction := DataBase.SQLTransaction;
     SQLQuery.DataBase := DataBase.IBConnection;

@@ -17,7 +17,7 @@ type
         TableNameLabel : TLabel;
         SaveBtn : TButton;
         CancelBtn : TButton;
-        constructor CreateNew(Component : TComponent; tableName : TCaption);
+        constructor Create(Component : TComponent; tableName : string);
         public
 
         private
@@ -31,14 +31,14 @@ implementation
 
 { TEditForm }
 
-constructor TEditForm.CreateNew(Component : TComponent; tableName : TCaption);
+
+constructor TEditForm.Create(Component: TComponent; tableName: string);
 begin
     Inherited Create(Component);
     Self.Caption := (Component as TButton).Caption + ' поле в таблицу';
     TableNameLabel.Caption := TableNameLabel.Caption + tableName;
 
     //CreteFieldChangers(tableName);
-    Self.Show();
 end;
 
 procedure TEditForm.CreateFieldChangers(tableName : string);
