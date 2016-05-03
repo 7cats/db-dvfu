@@ -6,7 +6,7 @@ interface
 
 uses
     Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls, Graphics,
-    Dialogs, DBGrids, Menus, ExtCtrls, udb, urequestform;
+    Dialogs, DBGrids, Menus, ExtCtrls, udb, urequestform, umetadata;
 
 type
 
@@ -52,14 +52,14 @@ end;
 
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+    i : integer;
 begin
     DataBase.Connect();
 
-    AddNewTableItem('GroupsItem', 'Группы', 0);
-    AddNewTableItem('LessonsItem', 'Предметы', 1);
-    AddNewTableItem('TeachersItem', 'Преподаватели', 2);
-    AddNewTableItem('LessonsTMItem', 'Время занятий', 3);
-    AddNewTableItem('ScheduleItem', 'Расписание', 4);
+    for i := 0 to MetaData.CountOfTables() do begin
+        AddNewTableItem(MetaData[i].FDBName + 'Item', MetaData[i].FCaption, i);
+    end;
 end;
 
 
