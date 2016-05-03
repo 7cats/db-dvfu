@@ -36,6 +36,7 @@ type
         private
             FCurrNewFilterPoint : TPoint;
             Table : TMetaTable;
+            TableIDInMetaData : integer;
             FFilters : array of TFilterComponent;
             CellIndex : integer;
             procedure ShowWithFilters();
@@ -196,8 +197,14 @@ end;
 
 
 procedure TRequestForm.ChangeTableBtnClick(Sender : TObject);
+var
+    fieldID : integer;
 begin
-    TEditForm.Create(Sender as TButton, Self.Caption).Show();
+    fieldID := DBGrid.DataSource.DataSet.FieldByName('ID').Value;
+    if ((Sender as TButton).Caption = 'Добавить') then begin
+        fieldID := -1;
+	end;
+    TEditForm.Create(Self.TableIDInMetaData, fieldID, Sender as TButton).Show();
 end;
 
 
@@ -244,6 +251,7 @@ var
 begin
     inherited Create(Component);
     Caption := (Component as TMenuItem).Caption;
+    TableIDInMetaData := (Component as TMenuItem).Tag;
 
     Table := MetaData.FTables[MetaData.GetTableIndex(caption)];
 
