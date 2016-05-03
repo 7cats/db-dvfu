@@ -34,8 +34,8 @@ type
             Shift: TShiftState; X, Y: Integer);
         procedure UpdateWidthAndCaptionGrid();
         private
-            PTable : PMetaTable;
             FCurrNewFilterPoint : TPoint;
+            Table : TMetaTable;
             FFilters : array of TFilterComponent;
             CellIndex : integer;
             procedure ShowWithFilters();
@@ -167,11 +167,11 @@ var
     i, col_grid, j : integer;
 begin
     col_grid := 0;
-    for i := 0 to PTable^.CountOfColumns() - 1 do begin
-        if (Length(PTable^[i].FForeignFields) > 0) then begin
-            for j := 0 to High((PTable^[i].FForeignFields)) do begin
+    for i := 0 to Table.CountOfColumns() - 1 do begin
+        if (Length(Table[i].FForeignFields) > 0) then begin
+            for j := 0 to High((Table[i].FForeignFields)) do begin
                 with DBGrid.Columns[col_grid] do begin
-                    Title.Caption := PTable^[i].FForeignFields[j];
+                    Title.Caption := Table[i].FForeignFields[j];
                     Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
                     inc(col_grid);
                 end;
@@ -179,7 +179,7 @@ begin
         end
         else begin
            with  DBGrid.Columns[col_grid] do begin
-               Title.Caption := PTable^[i].FCaption;
+               Title.Caption := Table[i].FCaption;
                Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
            end;
            inc(col_grid);
@@ -245,7 +245,7 @@ begin
     inherited Create(Component);
     Caption := (Component as TMenuItem).Caption;
 
-    PTable := MetaData.FTables[MetaData.GetTableIndex(caption)].GetAddr();
+    Table := MetaData.FTables[MetaData.GetTableIndex(caption)];
     Self.Show();
 
     SQLQuery.Transaction := DataBase.SQLTransaction;

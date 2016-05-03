@@ -16,18 +16,15 @@ type
         FForeignFields : array of string;
     end;
 
-    PMetaTable = ^TMetaTable;
-
     { TMetaTable }
 
-    TMetaTable = object
+    TMetaTable = class
     private
         function GetItem(const index : string): TTableColumn;
         function GetItem(const index : integer): TTableColumn;
     public
         FDBName, FCaption, FPrimaryCaption : string;
         FColumns : array of TTableColumn;
-        function GetAddr() : PMetaTable;
         function CountOfColumns() : integer;
         property Items[const index : string] : TTableColumn read GetItem; default;
     end;
@@ -48,6 +45,7 @@ type
             property Items[const index : string] : TMetaTable read GetItem; default;
             function CountOfTables() : integer;
             constructor Create();
+            destructor Destroy; override;
     end;
 
 var
@@ -81,17 +79,10 @@ begin
 end;
 
 
-function TMetaTable.GetAddr: PMetaTable;
-begin
-    result := @Self;
-end;
-
-
 function TMetaTable.CountOfColumns: integer;
 begin
     result := Length(FColumns);
 end;
-
 
 { TMetadata }
 
@@ -133,6 +124,7 @@ end;
 procedure TMetaData.AddTable(const DBName, Caption: String);
 begin
     SetLength(FTables, Length(FTables) + 1);
+    FTables[High(FTables)] := TMetaTable.Create();
     FTables[High(FTables)].FDBName := DBName;
     FTables[High(FTables)].FCaption := Caption;
 end;
@@ -177,6 +169,16 @@ end;
 
 constructor TMetaData.Create;
 begin
+end;
+
+destructor TMetaData.Destroy;
+var
+    i : integer;
+begin
+    for i := 0 to High(FTables) do begin
+        FTables[i].Free;
+	end;
+	inherited Destroy;
 end;
 
 initialization

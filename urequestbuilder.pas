@@ -48,10 +48,9 @@ procedure TRequestBuilder.NewRequest(const TableCaption: string;
     const conditions: TVectorConditions);
 var
     i, j, k : integer;
-    tableTmp : PMetaTable;
     isFirst : boolean = true;
     ForeingFields : TVectorPairString;
-    PTable : PMetaTable;
+    table, tableTmp : TMetaTable;
 
     procedure AddToRequest(toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
     begin
@@ -69,34 +68,34 @@ begin
     Initial();
     FRequest.Add('SELECT');
 
-    PTable :=  MetaData[TableCaption].GetAddr();
-    for i := 0 to PTable^.CountOfColumns() - 1 do begin
-        with PTable^[i] do begin
-            if (Length(PTable^[i].FForeignFields) > 0) then begin
+    table :=  MetaData[TableCaption];
+    for i := 0 to table.CountOfColumns() - 1 do begin
+        with table[i] do begin
+            if (Length(table[i].FForeignFields) > 0) then begin
                 j := 0; k := 0;
-                tableTmp := MetaData[FRefTableName].GetAddr();
-                while (j <> Length(PTable^[i].FForeignFields)) do begin
-                    if (PTable^[i].FForeignFields[j] = tableTmp^[k].FCaption) then begin
-                        ForeingFields.PushBack(PTable^.FColumns[i].FRefTableName, tableTmp^.FColumns[k].FDBName);
-                        AddToRequest(PTable^[i].FRefTableName + '.' + tableTmp^[k].FDBName, ',', '');
+                tableTmp := MetaData[FRefTableName];
+                while (j <> Length(table[i].FForeignFields)) do begin
+                    if (table[i].FForeignFields[j] = tableTmp[k].FCaption) then begin
+                        ForeingFields.PushBack(table.FColumns[i].FRefTableName, tableTmp.FColumns[k].FDBName);
+                        AddToRequest(table[i].FRefTableName + '.' + tableTmp[k].FDBName, ',', '');
                         inc(j);
                     end;
                     inc(k);
                 end;
             end
             else begin
-                AddToRequest(PTable^.FDBName + '.' + PTable^.FColumns[i].FDBName, ',', '');
-                ForeingFields.PushBack(PTable^.FDBName, PTable^.FColumns[i].FDBName);
+                AddToRequest(table.FDBName + '.' + table.FColumns[i].FDBName, ',', '');
+                ForeingFields.PushBack(table.FDBName, table.FColumns[i].FDBName);
             end;
         end;
     end;
 
-    FRequest.Add('FROM ' + PTable^.FDBName);
+    FRequest.Add('FROM ' + table.FDBName);
 
-    for i := 0 to PTable^.CountOfColumns() - 1 do begin
-        with PTable^[i] do begin
+    for i := 0 to table.CountOfColumns() - 1 do begin
+        with table[i] do begin
             if (Length(FForeignFields) > 0) then begin
-                FRequest.Add('INNER JOIN ' + FRefTableName + ' ON' + ' '  + FRefTableName   + '.' + FForeignKey + '='  + PTable^.FDBName + '.' + FDBName);
+                FRequest.Add('INNER JOIN ' + FRefTableName + ' ON' + ' '  + FRefTableName   + '.' + FForeignKey + '='  + table.FDBName + '.' + FDBName);
             end;
         end;
     end;
@@ -112,7 +111,7 @@ begin
         inc(j);
     end;
 
-    FRequest.Add('ORDER BY ' + PTable^.FDBName + '.' + PTable^[0].FDBName);
+    FRequest.Add('ORDER BY ' + table.FDBName + '.' + table[0].FDBName);
 end;
 
 
