@@ -15,8 +15,11 @@ type
 
     TEditForm = class(TForm)
         TableNameLabel : TLabel;
+        PanelTop : TPanel;
+        PanelBottom : TPanel;
         SaveBtn : TButton;
         CancelBtn : TButton;
+        DataScrollBox : TScrollBox;
         constructor Create(tableID, fieldID : integer; Component : TComponent);
         public
 
@@ -40,6 +43,7 @@ begin
 
     //CreteFieldChangers(tableName);
 end;
+
 
 procedure TEditForm.CreateFieldChangers(tableName : string);
 begin

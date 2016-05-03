@@ -1,34 +1,70 @@
 object EditForm: TEditForm
-  Left = 361
-  Height = 277
-  Top = 192
-  Width = 341
+  Left = 356
+  Height = 372
+  Top = 220
+  Width = 343
   Caption = 'EditForm'
-  ClientHeight = 277
-  ClientWidth = 341
+  ClientHeight = 372
+  ClientWidth = 343
   LCLVersion = '1.6.0.4'
-  object SaveBtn: TButton
-    Left = 8
-    Height = 25
-    Top = 248
-    Width = 75
-    Caption = 'Сохранить'
+  object PanelBottom: TPanel
+    Left = 0
+    Height = 37
+    Top = 335
+    Width = 343
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 37
+    ClientWidth = 343
     TabOrder = 0
+    object SaveBtn: TButton
+      Left = 3
+      Height = 31
+      Top = 3
+      Width = 75
+      Align = alLeft
+      BorderSpacing.Around = 3
+      Caption = 'Сохранить'
+      TabOrder = 0
+    end
+    object CancelBtn: TButton
+      Left = 84
+      Height = 31
+      Top = 3
+      Width = 75
+      Align = alLeft
+      BorderSpacing.Left = 3
+      BorderSpacing.Around = 3
+      Caption = 'Отмена'
+      TabOrder = 1
+    end
   end
-  object CancelBtn: TButton
-    Left = 96
-    Height = 25
-    Top = 248
-    Width = 75
-    Caption = 'Отмена'
+  object DataScrollBox: TScrollBox
+    Left = 0
+    Height = 305
+    Top = 30
+    Width = 343
+    HorzScrollBar.Page = 1
+    VertScrollBar.Page = 1
+    Align = alClient
     TabOrder = 1
   end
-  object TableNameLabel: TLabel
-    Left = 16
-    Height = 15
-    Top = 8
-    Width = 53
-    Caption = 'Таблица: '
-    ParentColor = False
+  object PanelTop: TPanel
+    Left = 0
+    Height = 30
+    Top = 0
+    Width = 343
+    Align = alTop
+    ClientHeight = 30
+    ClientWidth = 343
+    TabOrder = 2
+    object TableNameLabel: TLabel
+      Left = 10
+      Height = 15
+      Top = 10
+      Width = 53
+      Caption = 'Таблица: '
+      ParentColor = False
+    end
   end
 end
