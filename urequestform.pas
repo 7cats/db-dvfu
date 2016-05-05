@@ -35,7 +35,6 @@ type
         private
             TableIDInMetaData : integer;
             FFilters : array of TFilterComponent;
-            CellIndex : integer;
             procedure ShowWithFilters();
             procedure FilterAdd(filter : TFilterComponent);
             procedure FiltersPopBack();
