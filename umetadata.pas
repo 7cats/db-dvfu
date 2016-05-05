@@ -9,43 +9,59 @@ uses
 
 type
 
-    TTableColumn = record
-        FDBName, FCaption : string;
-        FRefTableName, FRefFieldName : string;
-        FForeignKey : string;
-        FForeignFields : array of string;
+    TMetaTable = class;
+
+    { TMetaColumn }
+
+    TMetaColumn = class
+        private
+            FDBName, FCaption : string;
+            FIsReference, FShowInReference : boolean;
+            FReferenceTable : TMetaTable;
+        public
+            property DBName : string read FDBName;
+            property Caption : string read FCaption;
+            property IsReference : boolean read FIsReference;
+            property ShowInReference : boolean read FShowInReference;
+            property ReferenceTable : TMetaTable read FReferenceTable;
+            constructor Create(ADBName, ACaption : string; AShow : boolean);
+            constructor Create(ADBName : string; ATable : TMetaTable);
     end;
+
 
     { TMetaTable }
 
     TMetaTable = class
     private
-        function GetItem(const index : string): TTableColumn;
-        function GetItem(const index : integer): TTableColumn;
+        FDBName, FCaption: string;
+        FColumns : array of TMetaColumn;
+        function GetItem(const index : string): TMetaColumn;
+        function GetItem(const index : integer): TMetaColumn;
     public
-        FDBName, FCaption, FPrimaryCaption : string;
-        FColumns : array of TTableColumn;
         function CountOfColumns() : integer;
-        property Items[const index : string] : TTableColumn read GetItem; default;
+        function AddColumn(ADBName, ACaption : string; AShow : boolean) : TMetaTable;
+        function AddColumn(ADBName : string; ATable : TMetaTable) : TMetaTable;
+        property DBName : string read FDBName;
+        property Caption : string read FCaption;
+        property Items[const index : string] : TMetaColumn read GetItem; default;
+        constructor Create(ADBName, ACaption : string);
+        destructor Destroy; override;
     end;
 
     { TMetaData }
 
     TMetaData = class
-        private
-            function GetItem(const index : integer) : TMetaTable;
-            function GetItem(const index : string) : TMetaTable;
-        public
-            FTables: array of TMetaTable;
-            function GetTableIndex(caption : string) : integer;
-            procedure AddTable(const DBName, Caption :String);
-            procedure AddTableColumn(const DBName, Caption: string);
-            procedure AddTableColumn(const DBName, Caption, RefTable, RefField: string;
-                    const outRTField: array of string; const ForeingKey : string);
-            property Items[const index : string] : TMetaTable read GetItem; default;
-            function CountOfTables() : integer;
-            constructor Create();
-            destructor Destroy; override;
+    private
+        FTables: array of TMetaTable;
+        function GetItem(const index : integer) : TMetaTable;
+        function GetItem(const indexI, indexJ : integer) : TMetaColumn;
+    public
+        function GetTableIndex(caption : string) : integer;
+        function AddTable(table : TMetaTable) : TMetaData;
+        function CountOfTables() : integer;
+        property Items[const index : integer] : TMetaTable read GetItem; default;
+        property ItemsIJ[const indexI, indexJ : integer] : TMetaColumn read GetItem;
+        destructor Destroy; override;
     end;
 
 var
@@ -53,9 +69,34 @@ var
 
 implementation
 
+var
+    classrooms, groups, lessons, teachers, lassons_times, lessons_types, weekdays, timetable : TMetaTable;
+
+
+{ TMetaColumn }
+
+constructor TMetaColumn.Create(ADBName, ACaption : string; AShow : boolean);
+begin
+    FDBName := ADBName;
+    FCaption := ACaption;
+    FShowInReference := AShow;
+    FIsReference := false;
+end;
+
+
+constructor TMetaColumn.Create(ADBName : string; ATable : TMetaTable);
+begin
+    FDBName := ADBName;
+    FCaption := '';
+    FShowInReference := true;
+    FIsReference := true;
+    FReferenceTable := ATable;
+end;
+
+
 { TMetaTable }
 
-function TMetaTable.GetItem(const index: string): TTableColumn;
+function TMetaTable.GetItem(const index: string): TMetaColumn;
 var
     i : integer;
 begin
@@ -72,7 +113,7 @@ begin
 end;
 
 
-function TMetaTable.GetItem(const index: integer): TTableColumn;
+function TMetaTable.GetItem(const index: integer): TMetaColumn;
 begin
     Assert((0 <= index) and (index <= High(FColumns)));
     result := FColumns[index];
@@ -84,6 +125,43 @@ begin
     result := Length(FColumns);
 end;
 
+
+function TMetaTable.AddColumn(ADBName, ACaption: string; AShow: boolean
+		): TMetaTable;
+begin
+    SetLength(FColumns, Length(FColumns) + 1);
+    FColumns[High(FColumns)] := TMetaColumn.Create(ADBName, ACaption, AShow);
+    result := Self;
+end;
+
+
+function TMetaTable.AddColumn(ADBName : string; ATable : TMetaTable
+    ) : TMetaTable;
+begin
+    SetLength(FColumns, Length(FColumns) + 1);
+    FColumns[High(FColumns)] := TMetaColumn.Create(ADBName, ATable);
+    result := Self;
+end;
+
+
+constructor TMetaTable.Create(ADBName, ACaption : string);
+begin
+    FDBName := ADBName;
+    FCaption := ACaption;
+end;
+
+
+destructor TMetaTable.Destroy;
+var
+    i : integer;
+begin
+    for i := 0 to High(FColumns) do begin
+        FColumns[i].Free;
+    end;
+    inherited Destroy;
+end;
+
+
 { TMetadata }
 
 function TMetaData.GetItem(const index: integer): TMetaTable;
@@ -93,18 +171,11 @@ begin
 end;
 
 
-function TMetaData.GetItem(const index: string): TMetaTable;
-var
-    i : integer;
+function TMetaData.GetItem(const indexI, indexJ: integer): TMetaColumn;
 begin
-    for i := 0 to High(FTables) do begin
-        with FTables[i] do begin
-            if (FCaption = index) or (FDBName = index) then begin
-                exit(FTables[i]);
-            end;
-        end;
-    end;
-    Raise Exception.Create('Invailid table');
+    Assert((0 <= indexI) and (indexI <= MetaData.CountOfTables()) and
+           (0 <= indexJ) and (indexJ <= MetaData[indexI].CountOfColumns() - 1));
+    result := MetaData.FTables[indexI].FColumns[indexJ];
 end;
 
 
@@ -120,44 +191,10 @@ begin
     Raise Exception.Create('Invalid column');
 end;
 
-
-procedure TMetaData.AddTable(const DBName, Caption: String);
+function TMetaData.AddTable(table : TMetaTable) : TMetaData;
 begin
     SetLength(FTables, Length(FTables) + 1);
-    FTables[High(FTables)] := TMetaTable.Create();
-    FTables[High(FTables)].FDBName := DBName;
-    FTables[High(FTables)].FCaption := Caption;
-end;
-
-
-procedure TMetaData.AddTableColumn(const DBName, Caption: string);
-begin
-    with FTables[High(FTables)] do begin
-        SetLength(FColumns, Length(FColumns) + 1);
-        FColumns[High(FColumns)].FDBName := DBName;
-        FColumns[High(FColumns)].FCaption := Caption;
-        FColumns[High(FColumns)].FRefFieldName := '';
-        FColumns[High(FColumns)].FRefTableName := '';
-    end;
-end;
-
-
-procedure TMetaData.AddTableColumn(const DBName, Caption, RefTable,
-    RefField: string; const outRTField: array of string;
-    const ForeingKey: string);
-var
-    i, j : integer;
-begin
-    AddTableColumn(DBName, Caption);
-    with FTables[High(FTables)].FColumns[High(FTables[High(FTables)].FColumns)] do begin
-        FRefTableName := RefTable;
-        FRefFieldName := RefField;
-        SetLength(FForeignFields, Length(outRTField));
-        for i := 0 to High(outRTField) do begin
-            FForeignFields[i] := outRTField[i];
-            FForeignKey := ForeingKey;
-        end;
-    end;
+    FTables[High(FTables)] := table;
 end;
 
 
@@ -166,10 +203,6 @@ begin
     result := High(FTables);
 end;
 
-
-constructor TMetaData.Create;
-begin
-end;
 
 destructor TMetaData.Destroy;
 var
@@ -182,48 +215,57 @@ begin
 end;
 
 initialization
+
+    classrooms := TMetaTable.Create('CLASSROOMS', 'Аудитории')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('NAME', 'Аудитория', true);
+
+    groups := TMetaTable.Create('GROUPS', 'Группы')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('NAME', 'Группа', true);
+
+    lessons := TMetaTable.Create('LESSONS', 'Предметы')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('NAME', 'Предмет', true);
+
+    teachers := TMetaTable.Create('TEACHERS', 'Преподаватели')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('LAST_NAME', 'Фамилия', true)
+        .AddColumn('FIRST_NAME', 'Имя', true)
+        .AddColumn('MIDDLE_NAME', 'Отчество', true);
+
+    lassons_times := TMetaTable.Create('LESSONS_TIMES', 'Время занятий')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('BEGIN_', 'Начало', true)
+        .AddColumn('END_', 'Конец', true);
+
+    lessons_types := TMetaTable.Create('LESSONS_TYPES', 'Типы занятий')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('NAME', 'Название', true);
+
+    weekdays := TMetaTable.Create('WEEKDAYS', 'Дни недели')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('NAME', 'Название', true);
+
+    timetable := TMetaTable.Create('TIMETABLE', 'Расписание')
+        .AddColumn('ID', 'ID', false)
+        .AddColumn('WEEKDAY_ID', weekdays)
+        .AddColumn('LESSON_TIME_ID', lassons_times)
+        .AddColumn('LESSON_ID', lessons)
+        .AddColumn('LESSON_TYPE_ID', lessons_types)
+        .AddColumn('TEACHER_ID',  teachers)
+        .AddColumn('GROUP_ID', groups)
+        .AddColumn('CLASSROOM_ID', classrooms);
+
     MetaData := TMetaData.Create();
-
-    MetaData.AddTable('CLASSROOMS', 'Аудитории');
-        MetaData.AddTableColumn('ID', 'ID');
-        MetaData.AddTableColumn('NAME', 'Аудитория');
-
-    MetaData.AddTable('GROUPS', 'Группы');
-        MetaData.AddTableColumn('ID', 'ID');
-        MetaData.AddTableColumn('NAME', 'Группа');
-
-    MetaData.AddTable('LESSONS', 'Предметы');
-        MetaData.AddTableColumn('ID', 'ID');
-        MetaData.AddTableColumn('NAME', 'Предмет');
-
-    MetaData.AddTable('TEACHERS', 'Преподаватели');
-        MetaData.AddTableColumn('ID', 'ID');
-        MetaData.AddTableColumn('LAST_NAME', 'Фамилия');
-        MetaData.AddTableColumn('FIRST_NAME', 'Имя');
-        MetaData.AddTableColumn('MIDDLE_NAME', 'Отчество');
-
-    MetaData.AddTable('LESSONS_TIMES', 'Время занятий');
-        MetaData.AddTableColumn('ID', 'Номер');
-        MetaData.AddTableColumn('BEGIN_', 'Начало');
-        MetaData.AddTableColumn('END_', 'Конец');
-
-    MetaData.AddTable('LESSONS_TYPES', 'Типы занятий');
-        MetaData.AddTableColumn('ID', 'ID');
-        MetaData.AddTableColumn('NAME', 'Название');
-
-    MetaData.AddTable('WEEKDAYS', 'Дни недели');
-        MetaData.AddTableColumn('ID', 'Номер');
-        MetaData.AddTableColumn('NAME', 'Название');
-
-    Metadata.AddTable('TIMETABLE', 'Расписание');
-        Metadata.AddTableColumn('ID', 'ID');
-        Metadata.AddTableColumn('WEEKDAY_ID', 'День Недели', 'WEEKDAYS', 'ID', ['Название'],  'ID');
-        Metadata.AddTableColumn('LESSON_TIME_ID', 'Время', 'LESSONS_TIMES', 'ID', ['Начало', 'Конец'], 'ID');
-        Metadata.AddTableColumn('LESSON_ID', 'Название', 'LESSONS', 'ID', ['Предмет'], 'ID');
-        Metadata.AddTableColumn('LESSON_TYPE_ID', 'Тип', 'LESSONS_TYPES', 'ID', ['Название'], 'ID');
-        Metadata.AddTableColumn('TEACHER_ID', 'Преподаватель', 'TEACHERS', 'ID', ['Фамилия', 'Имя', 'Отчество'], 'ID');
-        Metadata.AddTableColumn('GROUP_ID', 'Группа', 'GROUPS', 'ID', ['Группа'], 'ID');
-        Metadata.AddTableColumn('CLASSROOM_ID', 'Аудитория', 'CLASSROOMS', 'ID', ['Аудитория'], 'ID');
+    MetaData.AddTable(classrooms);
+    MetaData.AddTable(groups);
+    MetaData.AddTable(lessons);
+    MetaData.AddTable(teachers);
+    MetaData.AddTable(lassons_times);
+    MetaData.AddTable(lessons_types);
+    MetaData.AddTable(weekdays);
+    MetaData.AddTable(timetable);
 
 finalization
     MetaData.Free;

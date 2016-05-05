@@ -58,7 +58,7 @@ begin
     DataBase.Connect();
 
     for i := 0 to MetaData.CountOfTables() do begin
-        AddNewTableItem(MetaData[i].FDBName + 'Item', MetaData[i].FCaption, i);
+        AddNewTableItem(MetaData[i].DBName + 'Item', MetaData[i].Caption, i);
     end;
 end;
 

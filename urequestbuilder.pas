@@ -14,7 +14,8 @@ type
     TRequestBuilder = class
         constructor Create();
         destructor Destroy; override;
-        procedure NewRequest(const TableCaption : string; const conditions : TVectorConditions);
+        procedure NewRequest(const TableID : integer;
+            const conditions : TVectorConditions);
         procedure Initial();
         procedure GetReq(var SQLQuery : TSQLQuery);
         private
@@ -44,13 +45,12 @@ begin
 end;
 
 
-procedure TRequestBuilder.NewRequest(const TableCaption: string;
+procedure TRequestBuilder.NewRequest(const TableID: integer;
     const conditions: TVectorConditions);
 var
-    i, j, k : integer;
+    i, j : integer;
     isFirst : boolean = true;
     ForeingFields : TVectorPairString;
-    table, tableTmp : TMetaTable;
 
     procedure AddToRequest(toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
     begin
@@ -68,34 +68,31 @@ begin
     Initial();
     FRequest.Add('SELECT');
 
-    table :=  MetaData[TableCaption];
-    for i := 0 to table.CountOfColumns() - 1 do begin
-        with table[i] do begin
-            if (Length(table[i].FForeignFields) > 0) then begin
-                j := 0; k := 0;
-                tableTmp := MetaData[FRefTableName];
-                while (j <> Length(table[i].FForeignFields)) do begin
-                    if (table[i].FForeignFields[j] = tableTmp[k].FCaption) then begin
-                        ForeingFields.PushBack(table.FColumns[i].FRefTableName, tableTmp.FColumns[k].FDBName);
-                        AddToRequest(table[i].FRefTableName + '.' + tableTmp[k].FDBName, ',', '');
-                        inc(j);
+    for i := 0 to MetaData[TableID].CountOfColumns() - 1 do begin
+        with MetaData[TableID, i] do begin
+            if (IsReference) then begin
+                for j := 0 to ReferenceTable.CountOfColumns() - 1 do begin
+                    if (ReferenceTable[j].ShowInReference) then begin
+                        ForeingFields.PushBack(ReferenceTable.DBName, ReferenceTable[j].DBName);
+                        AddToRequest(ReferenceTable.DBName + '.' + ReferenceTable[j].DBName, ',', '');
                     end;
-                    inc(k);
                 end;
             end
             else begin
-                AddToRequest(table.FDBName + '.' + table.FColumns[i].FDBName, ',', '');
-                ForeingFields.PushBack(table.FDBName, table.FColumns[i].FDBName);
+                AddToRequest(MetaData[TableID].DBName + '.' + DBName, ',', '');
+                ForeingFields.PushBack(MetaData[TableID].DBName, DBName);
             end;
         end;
     end;
 
-    FRequest.Add('FROM ' + table.FDBName);
+    FRequest.Add('FROM ' + MetaData[TableID].DBName);
 
-    for i := 0 to table.CountOfColumns() - 1 do begin
-        with table[i] do begin
-            if (Length(FForeignFields) > 0) then begin
-                FRequest.Add('INNER JOIN ' + FRefTableName + ' ON' + ' '  + FRefTableName   + '.' + FForeignKey + '='  + table.FDBName + '.' + FDBName);
+    for i := 0 to MetaData[TableID].CountOfColumns() - 1 do begin
+        with MetaData[TableID, i] do begin
+            if (IsReference) then begin
+                FRequest.Add('INNER JOIN ' + ReferenceTable.DBName + ' ON '
+                    + ReferenceTable.DBName + '.' + ReferenceTable[0].DBName + '='
+                    + MetaData[TableID].DBName + '.' + DBName);
             end;
         end;
     end;
@@ -103,7 +100,7 @@ begin
     j := 0;
     for i := 0 to conditions.High_() do begin
         with ForeingFields[conditions[i].FIndexParam] do begin
-            AddToRequest(FTableName^ + '.' + FFieldName^
+            AddToRequest(FTableName + '.' + FFieldName
                    + conditions[i].FOperation + ':p' + IntToStr(j), 'AND', 'WHERE');
         end;
         SetLength(FParams, Length(FParams) + 1);
@@ -111,7 +108,7 @@ begin
         inc(j);
     end;
 
-    FRequest.Add('ORDER BY ' + table.FDBName + '.' + table[0].FDBName);
+    FRequest.Add('ORDER BY ' + MetaData[TableID].DBName + '.' + MetaData[TableID, 0].DBName);
 end;
 
 

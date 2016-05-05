@@ -39,7 +39,7 @@ constructor TEditForm.Create(tableID, fieldID: integer; Component: TComponent);
 begin
     Inherited Create(Component);
     Self.Caption := (Component as TButton).Caption + ' поле в таблицу';
-    TableNameLabel.Caption := TableNameLabel.Caption + '"' + MetaData[tableID].FCaption + '"';
+    TableNameLabel.Caption := TableNameLabel.Caption + '"' + MetaData[tableID].Caption + '"';
 
     //CreteFieldChangers(tableName);
 end;

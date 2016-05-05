@@ -22,8 +22,8 @@ type
     { TPairString }
 
     TPairString = object
-        FTableName, FFieldName : ^string;
-        procedure MakePair(var first, second : string);
+        FTableName, FFieldName : string;
+        procedure MakePair(first, second : string);
     end;
 
     { TVectorPairString }
@@ -33,7 +33,7 @@ type
             function GetItem(index : integer) : TPairString;
         public
             FPairs : array of TPairString;
-            procedure PushBack(var first, second : string);
+            procedure PushBack(first, second : string);
             property Item[index : integer] : TPairString read GetItem; default;
             function High_() : integer;
     end;
@@ -113,7 +113,7 @@ end;
 
 { TVectorPairString }
 
-procedure TVectorPairString.PushBack(var first, second: string);
+procedure TVectorPairString.PushBack(first, second: string);
 var
     tmp : TPairString;
 begin
@@ -139,10 +139,10 @@ end;
 
 { TPairString }
 
-procedure TPairString.MakePair(var first, second: string);
+procedure TPairString.MakePair(first, second: string);
 begin
-    FTableName := @first;
-    FFieldName := @second;
+    FTableName := first;
+    FFieldName := second;
 end;
 
 

@@ -35,7 +35,6 @@ type
         procedure UpdateWidthAndCaptionGrid();
         private
             FCurrNewFilterPoint : TPoint;
-            Table : TMetaTable;
             TableIDInMetaData : integer;
             FFilters : array of TFilterComponent;
             CellIndex : integer;
@@ -74,7 +73,7 @@ begin
                 filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, FFilters[i].FSearchEdit.Text, FFilters[i].FFieldCB.ItemIndex);
             end;
         end;
-        RequestBuilder.NewRequest(Self.Text, filters);
+        RequestBuilder.NewRequest(TableIDInMetaData, filters);
         ShowWithFilters();
     except
         ShowMessage('Введите корректно данные');
@@ -168,22 +167,26 @@ var
     i, col_grid, j : integer;
 begin
     col_grid := 0;
-    for i := 0 to Table.CountOfColumns() - 1 do begin
-        if (Length(Table[i].FForeignFields) > 0) then begin
-            for j := 0 to High((Table[i].FForeignFields)) do begin
-                with DBGrid.Columns[col_grid] do begin
-                    Title.Caption := Table[i].FForeignFields[j];
-                    Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
-                    inc(col_grid);
+    for i := 0 to MetaData[TableIDInMetaData].CountOfColumns() - 1 do begin
+        with MetaData[TableIDInMetaData, i] do begin
+           if (IsReference) then begin
+                for j := 0 to ReferenceTable.CountOfColumns() - 1 do begin
+                    with DBGrid.Columns[col_grid] do begin
+                        if (ReferenceTable[j].ShowInReference) then begin
+                            Title.Caption := ReferenceTable[j].Caption;
+                            Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
+                            inc(col_grid);
+                        end;
+                    end;
                 end;
+            end
+            else begin
+                with  DBGrid.Columns[col_grid] do begin
+                    Title.Caption := Caption;
+                    Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
+                end;
+                inc(col_grid);
             end;
-        end
-        else begin
-           with  DBGrid.Columns[col_grid] do begin
-               Title.Caption := Table[i].FCaption;
-               Width := space + DBGrid.Canvas.TextWidth(DBGrid.Columns[col_grid].title.caption);
-           end;
-           inc(col_grid);
         end;
     end;
 end;
@@ -253,12 +256,10 @@ begin
     Caption := (Component as TMenuItem).Caption;
     TableIDInMetaData := (Component as TMenuItem).Tag;
 
-    Table := MetaData.FTables[MetaData.GetTableIndex(caption)];
-
     SQLQuery.Transaction := DataBase.SQLTransaction;
     SQLQuery.DataBase := DataBase.IBConnection;
 
-    RequestBuilder.NewRequest(Self.Text, emptyConditions);
+    RequestBuilder.NewRequest(TableIDInMetaData, emptyConditions);
     ShowWithFilters();
 end;
 
