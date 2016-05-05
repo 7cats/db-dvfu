@@ -5,7 +5,7 @@ unit ucondition;
 interface
 
 uses
-    Classes, SysUtils, StdCtrls, Buttons;
+    Classes, SysUtils, StdCtrls, Buttons, ExtCtrls;
 
 type
 
@@ -15,7 +15,9 @@ type
         FFieldCB, FOperationCB : TComboBox;
         FSearchEdit : TEdit;
         FCloseItem : TButton;
-        constructor Create(fieldCB, operationCB : TComboBox; searchEdit : TEdit; closeItem : TButton);
+        FPanel : TPanel;
+        constructor Create(fieldCB, operationCB : TComboBox; searchEdit : TEdit;
+            closeItem : TButton; panel : TPanel);
         destructor Destroy(); override;
     end;
 
@@ -63,12 +65,13 @@ implementation
 { TCondition }
 
 constructor TFilterComponent.Create(fieldCB, operationCB: TComboBox; searchEdit: TEdit;
-    closeItem: TButton);
+    closeItem: TButton; panel : TPanel);
 begin
     FFieldCB := fieldCB;
     FOperationCB := operationCB;
     FSearchEdit := searchEdit;
     FCloseItem := closeItem;
+    FPanel := panel;
 end;
 
 
@@ -82,6 +85,8 @@ begin
     FSearchEdit.Free;
     FCloseItem.Hide;
     FCloseItem.Free;
+    FPanel.Hide;
+    FPanel.Free;
     inherited Destroy();
 end;
 

@@ -1,16 +1,15 @@
 object RequestForm: TRequestForm
-  Left = 317
-  Height = 674
-  Top = 62
+  Left = 222
+  Height = 671
+  Top = 34
   Width = 941
   Caption = 'Применить'
-  ClientHeight = 674
+  ClientHeight = 671
   ClientWidth = 941
-  OnCreate = FormCreate
   LCLVersion = '1.6.0.4'
   object DBGrid: TDBGrid
     Left = 0
-    Height = 368
+    Height = 376
     Top = 0
     Width = 941
     Align = alTop
@@ -63,6 +62,17 @@ object RequestForm: TRequestForm
     Width = 75
     Caption = 'Удалить'
     TabOrder = 5
+  end
+  object ScrollBox: TScrollBox
+    Left = 103
+    Height = 295
+    Top = 376
+    Width = 838
+    HorzScrollBar.Page = 1
+    VertScrollBar.Page = 1
+    Align = alRight
+    BorderStyle = bsNone
+    TabOrder = 6
   end
   object DataSource: TDataSource
     DataSet = SQLQuery

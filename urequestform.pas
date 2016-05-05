@@ -10,7 +10,6 @@ uses
     Grids, math, ucondition, ueditform;
 const
     space = 10;
-    space_btn = 8;
 type
 
     { TRequestForm }
@@ -22,25 +21,23 @@ type
         PlusFilterBtn: TButton;
         DataSource: TDataSource;
         DBGrid: TDBGrid;
+        ScrollBox : TScrollBox;
         SQLQuery: TSQLQuery;
         ApplyFiltersBtn: TToggleBox;
         procedure ChangeTableBtnClick(Sender : TObject);
         procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
             DataCol: Integer; Column: TColumn; State: TGridDrawState);
-        procedure FormCreate(Sender: TObject);
         procedure ApplyFiltersBtnClick(Sender: TObject);
         procedure PlusFilterBtnClick(Sender: TObject);
         procedure RemoveFilterBtnMouseDown(Sender: TObject; Button: TMouseButton;
             Shift: TShiftState; X, Y: Integer);
         procedure UpdateWidthAndCaptionGrid();
         private
-            FCurrNewFilterPoint : TPoint;
             TableIDInMetaData : integer;
             FFilters : array of TFilterComponent;
             CellIndex : integer;
             procedure ShowWithFilters();
             procedure FilterAdd(filter : TFilterComponent);
-            procedure NewPos(filter : TFilterComponent);
             procedure FiltersPopBack();
         public
             constructor Create(Component : TComponent); overload;
@@ -52,12 +49,6 @@ implementation
 {$R *.lfm}
 
 { TRequestForm }
-
-procedure TRequestForm.FormCreate(Sender: TObject);
-begin
-    FCurrNewFilterPoint := Point(PlusFilterBtn.Left +  3 * PlusFilterBtn.Width ,PlusFilterBtn.Top);
-end;
-
 
 procedure TRequestForm.ApplyFiltersBtnClick(Sender: TObject);
 var
@@ -84,30 +75,37 @@ end;
 
 procedure TRequestForm.PlusFilterBtnClick(Sender: TObject);
 var
-    i, x, y : integer;
+    i : integer;
     FieldCB, OperationCB : TComboBox;
     SearchEdit : TEdit;
     CloseIm : TButton;
+    panel : TPanel;
 begin
-    x := FCurrNewFilterPoint.x;
-    y := FCurrNewFilterPoint.y;
+    FieldCB := TComboBox.Create(Self);
+
+    panel := TPanel.Create(Self);
+    panel.Top := maxSmallint;
+    panel.Align := alTop;
+    panel.BevelOuter := bvNone;
+    panel.Height := FieldCB.Height + space;
+    panel.Parent := ScrollBox;
 
     FieldCB := TComboBox.Create(Self);
-    FieldCB.Top :=  Y;
-    FieldCB.Left := X;
-    FieldCB.Parent := Self;
+    FieldCB.Left := maxSmallint;
+    FieldCB.Align := alLeft;
+    FieldCB.BorderSpacing.Around := 6;
     FieldCB.ReadOnly := True;
-
-    X += FieldCB.Width + space;
+    FieldCB.Parent := panel;
 
     for i := 0 to DBGrid.Columns.Count - 1 do  begin
         FieldCB.AddItem(DBGrid.Columns[i].Title.Caption, FieldCB);
     end;
 
     OperationCB := TComboBox.Create(Self);
-    OperationCB.Top := Y;
-    OperationCB.Left := X;
-    OperationCB.Parent := Self;
+    OperationCB.Left := maxSmallint;
+    OperationCB.Align := alLeft;
+    OperationCB.BorderSpacing.Around := 6;
+    OperationCB.Parent := panel;
     OperationCB.ReadOnly := True;
     OperationCB.AddItem(' > ', OperationCB);
     OperationCB.AddItem(' <> ', OperationCB);
@@ -117,25 +115,21 @@ begin
     OperationCB.AddItem(' = ', OperationCB);
     OperationCB.AddItem(' Like ', OperationCB);
 
-    X += OperationCB.Width + space;
-
-    SearchEdit := TEdit.Create(nil);
-    SearchEdit.Parent := Self;
-    SearchEdit.Top := Y;
-    SearchEdit.Left := X;
-
-    X += SearchEdit.Width + space;
+    SearchEdit := TEdit.Create(Self);
+    SearchEdit.Left := maxSmallint;
+    SearchEdit.Align := alLeft;
+    SearchEdit.BorderSpacing.Around := 5;
+    SearchEdit.Parent := panel;
 
     CloseIm := TButton.Create(Self);
-    CloseIm.Parent := Self;
+    CloseIm.Left := maxSmallint;
+    CloseIm.Align := alLeft;
+    CloseIm.BorderSpacing.Around := 4;
+    CloseIm.Parent := panel;
     CloseIm.Caption := 'X';
     CloseIm.OnMouseDown := @RemoveFilterBtnMouseDown;
-    CloseIm.Top := Y;
-    CloseIm.Left := X;
 
-    FilterAdd(TFilterComponent.Create(FieldCB, OperationCB, SearchEdit, CloseIm));
-
-    FCurrNewFilterPoint.Y += FieldCB.Height + space;
+    FilterAdd(TFilterComponent.Create(FieldCB, OperationCB, SearchEdit, CloseIm, panel));
 
     ApplyFiltersBtn.State := cbUnchecked;
 end;
@@ -151,11 +145,9 @@ begin
         tmp := FFilters[i];
         FFilters[i] := FFilters[i + 1];
         FFilters[i + 1] := tmp;
+        FFilters[i].FPanel.Top := FFilters[i].FPanel.Top - 1;
         FFilters[i].FCloseItem.Tag := FFilters[i].FCloseItem.Tag - 1;
-        NewPos(FFilters[i]);
     end;
-
-    FCurrNewFilterPoint.Y -= (FFilters[High(FFilters)].FFieldCB.Height + space);
 
     ApplyFiltersBtn.Checked := false;
     FiltersPopBack();
@@ -227,17 +219,6 @@ begin
     SetLength(FFilters, Length(FFilters) + 1);
     filter.FCloseItem.Tag := High(FFilters);
     FFilters[High(FFilters)] := filter;
-end;
-
-
-procedure TRequestForm.NewPos(filter: TFilterComponent);
-begin
-    with filter do begin
-        FFieldCB.Top := FFieldCB.Top - (FFieldCB.Height + space);
-        FOperationCB.Top := FOperationCB.Top - (FOperationCB.Height + space);
-        FSearchEdit.Top := FSearchEdit.Top - (FSearchEdit.Height + space);
-        FCloseItem.Top := FCloseItem.Top - (FCloseItem.Height + space_btn);
-    end;
 end;
 
 
