@@ -5,9 +5,9 @@ unit urequestform;
 interface
 
 uses
-    Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
-    DBGrids, udb, menus, StdCtrls, Buttons, ExtCtrls, umetadata, urequestbuilder,
-    Grids, math, ucondition, ueditform;
+    Classes, SysUtils, db, sqldb, FBEventMonitor, FileUtil, Forms, Controls,
+    Graphics, Dialogs, DBGrids, udb, menus, StdCtrls, Buttons, ExtCtrls,
+    umetadata, urequestbuilder, Grids, math, ucondition, ueditform;
 const
     space = 10;
 type
@@ -28,6 +28,7 @@ type
         procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
             DataCol: Integer; Column: TColumn; State: TGridDrawState);
         procedure ApplyFiltersBtnClick(Sender: TObject);
+        procedure EraseFTableBtnClick(Sender: TObject);
         procedure PlusFilterBtnClick(Sender: TObject);
         procedure RemoveFilterBtnMouseDown(Sender: TObject; Button: TMouseButton;
             Shift: TShiftState; X, Y: Integer);
@@ -69,6 +70,22 @@ begin
         ShowMessage('Введите корректно данные');
         ApplyFiltersBtn.State := cbUnchecked;
     end;
+end;
+
+procedure TRequestForm.EraseFTableBtnClick(Sender: TObject);
+        procedure DeleteField(tableID, fieldID : integer);
+        var
+       lSQLQuery : TSQLQuery;
+    begin
+        lSQLQuery := TSQLQuery.Create(self);
+        lSQLQuery.Transaction := DataBase.SQLTransaction;
+        ShowMessage(RequestBuilder.GetDeleteSQLText(tableID, fieldID));
+        lSQLQuery.SQL.Text := RequestBuilder.GetDeleteSQLText(tableID, fieldID);
+        lSQLQuery.ExecSQL;
+        DataBase.SQLTransaction.Commit;
+    end;
+begin
+    DeleteField(Self.TableIDInMetaData, DBGrid.DataSource.DataSet.FieldByName('ID').Value);
 end;
 
 

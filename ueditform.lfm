@@ -1,21 +1,24 @@
 object EditForm: TEditForm
-  Left = 356
+  Left = 482
   Height = 372
-  Top = 220
-  Width = 343
+  Top = 300
+  Width = 341
+  ActiveControl = SaveBtn
   Caption = 'EditForm'
   ClientHeight = 372
-  ClientWidth = 343
-  LCLVersion = '1.6.0.4'
+  ClientWidth = 341
+  OnCreate = FormCreate
+  LCLVersion = '1.7'
+  Visible = False
   object PanelBottom: TPanel
     Left = 0
     Height = 37
     Top = 335
-    Width = 343
+    Width = 341
     Align = alBottom
     BevelOuter = bvNone
     ClientHeight = 37
-    ClientWidth = 343
+    ClientWidth = 341
     TabOrder = 0
     object SaveBtn: TButton
       Left = 3
@@ -25,6 +28,7 @@ object EditForm: TEditForm
       Align = alLeft
       BorderSpacing.Around = 3
       Caption = 'Сохранить'
+      OnClick = SaveBtnClick
       TabOrder = 0
     end
     object CancelBtn: TButton
@@ -36,27 +40,30 @@ object EditForm: TEditForm
       BorderSpacing.Left = 3
       BorderSpacing.Around = 3
       Caption = 'Отмена'
+      OnClick = CancelBtnClick
       TabOrder = 1
     end
   end
-  object DataScrollBox: TScrollBox
+  object ScrollBox: TScrollBox
     Left = 0
-    Height = 305
-    Top = 30
-    Width = 343
+    Height = 295
+    Top = 40
+    Width = 341
     HorzScrollBar.Page = 1
     VertScrollBar.Page = 1
     Align = alClient
+    BorderStyle = bsNone
     TabOrder = 1
   end
   object PanelTop: TPanel
     Left = 0
-    Height = 30
+    Height = 40
     Top = 0
-    Width = 343
+    Width = 341
     Align = alTop
-    ClientHeight = 30
-    ClientWidth = 343
+    BevelOuter = bvNone
+    ClientHeight = 40
+    ClientWidth = 341
     TabOrder = 2
     object TableNameLabel: TLabel
       Left = 10
@@ -66,5 +73,16 @@ object EditForm: TEditForm
       Caption = 'Таблица: '
       ParentColor = False
     end
+  end
+  object DataSource: TDataSource
+    DataSet = SQLQuery
+    left = 315
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <>
+    Filtered = True
+    Options = [sqoAutoApplyUpdates]
+    Params = <>
+    left = 280
   end
 end

@@ -17,6 +17,10 @@ type
         procedure NewRequest(const TableID : integer;
             const conditions : TVectorConditions);
         procedure Initial();
+        function GetInsertSQLText(tableID: integer): string;
+        function GetSelectSQLText(tableID, fieldID: integer): string;
+        function GetUpdateSQLText(tableID, fieldID: integer): string;
+        function GetDeleteSQLText(tableID, fieldID: integer): string;
         procedure GetReq(var SQLQuery : TSQLQuery);
         private
             FRequest : TStringList;
@@ -117,6 +121,31 @@ begin
     FRequest.Clear;
     FirstFilter := true;
     SetLength(FParams, 0);
+end;
+
+function TRequestBuilder.GetInsertSQLText(tableID: integer): string;
+begin
+    result := 'INSERT INTO ' + Metadata[TableId].DBName + ' (' + MetaData[tableID].FieldListStr('%s')
+        + ')  VALUES (' + Metadata[TableId].FieldListStr(':%s') + ')';
+end;
+
+function TRequestBuilder.GetSelectSQLText(tableID, fieldID: integer
+        ): string;
+begin
+    result := 'SELECT ' + MetaData[tableID].FieldListStr('%s') + ' FROM ' + MetaData[tableID].DBName
+        + ' WHERE ID = ' + IntToStr(fieldID);
+end;
+
+function TRequestBuilder.GetUpdateSQLText(tableID, fieldID: integer
+        ): string;
+begin
+    result := 'UPDATE ' + Metadata[TableId].DBName +  ' SET ' + MetaData[tableID].FieldListStr('%s = :%1$')  + ' where id = ' + intToStr(fieldID);
+    ShowMessage(Result);
+end;
+
+function TRequestBuilder.GetDeleteSQLText(tableID, fieldID: integer): string;
+begin
+    result := Format('DELETE FROM %s WHERE ID = %d', [Metadata[TableId].DBName, fieldID]);
 end;
 
 

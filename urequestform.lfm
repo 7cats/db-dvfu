@@ -61,11 +61,12 @@ object RequestForm: TRequestForm
     Top = 632
     Width = 75
     Caption = 'Удалить'
+    OnClick = EraseFTableBtnClick
     TabOrder = 5
   end
   object ScrollBox: TScrollBox
-    Left = 103
-    Height = 295
+    Left = 96
+    Height = 293
     Top = 376
     Width = 838
     HorzScrollBar.Page = 1
@@ -79,8 +80,10 @@ object RequestForm: TRequestForm
   end
   object SQLQuery: TSQLQuery
     FieldDefs = <>
-    Options = []
+    Options = [sqoAutoApplyUpdates]
     Params = <>
-    left = 48
+    left = 40
+    top = 16
+  end
   end
 end

@@ -38,6 +38,8 @@ type
         function GetItem(const index : string): TMetaColumn;
         function GetItem(const index : integer): TMetaColumn;
     public
+        function FieldListStr(AFormat : string): string;
+        function FieldListStrNoID(AFormat, ASeparator : string) : string;
         function CountOfColumns() : integer;
         function AddColumn(ADBName, ACaption : string; AShow : boolean) : TMetaTable;
         function AddColumn(ADBName : string; ATable : TMetaTable) : TMetaTable;
@@ -117,6 +119,32 @@ function TMetaTable.GetItem(const index: integer): TMetaColumn;
 begin
     Assert((0 <= index) and (index <= High(FColumns)));
     result := FColumns[index];
+end;
+
+function TMetaTable.FieldListStr(AFormat : string) : string;
+var
+    i: integer;
+begin
+    Result := '';
+    for i := 0 to High(FColumns) do begin
+        if (i > 0) then begin
+            Result += ',';
+        end;
+        Result += Format(AFormat, [FColumns[i].FDBName]);
+    end;
+end;
+
+function TMetaTable.FieldListStrNoID(AFormat, ASeparator : string) : string;
+var
+    i : integer;
+begin
+    Result := '';
+    for i := 1 to High(FColumns) do begin
+        if (i > 1) then begin
+            Result += ASeparator;
+        end;
+        Result += Format(AFormat, [FColumns[i].FDBName]);
+    end;
 end;
 
 
