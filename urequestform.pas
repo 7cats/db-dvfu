@@ -18,7 +18,7 @@ type
   AddToTableBtn: TButton;
   ChangeTableBtn: TButton;
   EraseFTableBtn: TButton;
-  FBEventMonitor1: TFBEventMonitor;
+  FBEventMonitor: TFBEventMonitor;
   Image1: TImage;
   PlusFilterBtn: TButton;
   DataSource: TDataSource;
@@ -31,10 +31,14 @@ type
     DataCol: Integer; Column: TColumn; State: TGridDrawState);
   procedure ApplyFiltersBtnClick(Sender: TObject);
   procedure EraseFTableBtnClick(Sender: TObject);
+  procedure FBEventMonitorError(Sender : TObject; ErrorCode : integer);
+  procedure FBEventMonitorEventAlert(Sender : TObject; EventName : string;
+      EventCount : longint; var CancelAlerts : boolean);
   procedure PlusFilterBtnClick(Sender: TObject);
   procedure RemoveFilterBtnMouseDown(Sender: TObject; Button: TMouseButton;
     Shift: TShiftState; X, Y: Integer);
   procedure UpdateWidthAndCaptionGrid();
+  procedure UpdateSheet();
   private
     TableIDInMetaData : integer;
     FFilters : array of TFilterComponent;
@@ -44,8 +48,6 @@ type
   public
     constructor Create(Component : TComponent); overload;
     destructor Destroy; override;
-    //TODO: добавить удаление
-    //TODO: добавить нотификации
   end;
 
 implementation
@@ -76,6 +78,7 @@ begin
   end;
 end;
 
+
 procedure TRequestForm.EraseFTableBtnClick(Sender: TObject);
   procedure DeleteField(tableID, fieldID : integer);
   var
@@ -83,13 +86,25 @@ procedure TRequestForm.EraseFTableBtnClick(Sender: TObject);
   begin
     lSQLQuery := TSQLQuery.Create(self);
     lSQLQuery.Transaction := DataBase.SQLTransaction;
-    ShowMessage(RequestBuilder.GetDeleteSQLText(tableID, fieldID));
+    //ShowMessage(RequestBuilder.GetDeleteSQLText(tableID, fieldID));
     lSQLQuery.SQL.Text := RequestBuilder.GetDeleteSQLText(tableID, fieldID);
     lSQLQuery.ExecSQL;
     DataBase.SQLTransaction.Commit;
   end;
 begin
   DeleteField(Self.TableIDInMetaData, DBGrid.DataSource.DataSet.FieldByName('ID').Value);
+end;
+
+procedure TRequestForm.FBEventMonitorError(Sender : TObject;
+    ErrorCode : integer);
+begin
+  ShowMessage('Возникла ошибка, проверьте ');
+end;
+
+procedure TRequestForm.FBEventMonitorEventAlert(Sender : TObject;
+    EventName : string; EventCount : longint; var CancelAlerts : boolean);
+begin
+  UpdateSheet();
 end;
 
 
@@ -203,6 +218,14 @@ begin
   end;
 end;
 
+procedure TRequestForm.UpdateSheet;
+var
+  emptyConditions : TVectorConditions;
+begin
+  RequestBuilder.NewRequest(TableIDInMetaData, emptyConditions);
+  ShowWithFilters();
+end;
+
 
 procedure TRequestForm.DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
   DataCol: Integer; Column: TColumn; State: TGridDrawState);
@@ -250,18 +273,17 @@ end;
 
 
 constructor TRequestForm.Create(Component: TComponent);
-var
-  emptyConditions : TVectorConditions;
 begin
   inherited Create(Component);
   Caption := (Component as TMenuItem).Caption;
   TableIDInMetaData := (Component as TMenuItem).Tag;
 
+  FBEventMonitor.Connection := DataBase.IBConnection;
+  FBEventMonitor.RegisterEvents;
+
   SQLQuery.Transaction := DataBase.SQLTransaction;
   SQLQuery.DataBase := DataBase.IBConnection;
-
-  RequestBuilder.NewRequest(TableIDInMetaData, emptyConditions);
-  ShowWithFilters();
+  UpdateSheet();
 end;
 
 

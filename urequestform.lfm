@@ -1,12 +1,13 @@
 object RequestForm: TRequestForm
-  Left = 222
+  Left = 150
   Height = 671
-  Top = 34
+  Top = 50
   Width = 941
+  ActiveControl = DBGrid
   Caption = 'Применить'
   ClientHeight = 671
   ClientWidth = 941
-  LCLVersion = '1.6.0.4'
+  Visible = False
   object DBGrid: TDBGrid
     Left = 0
     Height = 376
@@ -65,8 +66,8 @@ object RequestForm: TRequestForm
     TabOrder = 5
   end
   object ScrollBox: TScrollBox
-    Left = 96
-    Height = 293
+    Left = 103
+    Height = 295
     Top = 376
     Width = 838
     HorzScrollBar.Page = 1
@@ -82,8 +83,15 @@ object RequestForm: TRequestForm
     FieldDefs = <>
     Options = [sqoAutoApplyUpdates]
     Params = <>
-    left = 40
-    top = 16
+    left = 48
   end
+  object FBEventMonitor: TFBEventMonitor
+    Events.Strings = (
+      'insert_to_db'
+    )
+    Registered = False
+    OnEventAlert = FBEventMonitorEventAlert
+    OnError = FBEventMonitorError
+    left = 96
   end
 end

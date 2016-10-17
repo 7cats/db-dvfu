@@ -214,7 +214,7 @@ var
   i : integer;
 begin
   for i := 0 to High(FTables) do begin
-    if (FTables[i].FCaption = caption) then begin
+    if (FTables[i].FCaption = caption)  or (FTables[i].FDBName = caption) then begin
       exit(i);
     end;
   end;

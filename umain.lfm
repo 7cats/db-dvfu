@@ -1,13 +1,26 @@
 object MainForm: TMainForm
-  Left = 485
-  Height = 650
-  Top = 121
+  Left = 528
+  Height = 680
+  Top = 169
   Width = 950
+  ActiveControl = TimeTable
   Caption = 'Main'
+  ClientHeight = 680
+  ClientWidth = 950
   Menu = MainMenu
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.7'
+  Visible = False
+  object TimeTable: TDrawGrid
+    Left = 0
+    Height = 660
+    Top = 0
+    Width = 950
+    Align = alClient
+    ExtendedSelect = False
+    TabOrder = 0
+  end
   object MainMenu: TMainMenu
     left = 16
     object FileItem: TMenuItem
@@ -27,5 +40,15 @@ object MainForm: TMainForm
         OnClick = AbAutorItemClick
       end
     end
+  end
+  object DataSource: TDataSource
+    DataSet = SQLQuery
+    left = 920
+  end
+  object SQLQuery: TSQLQuery
+    FieldDefs = <>
+    Options = []
+    Params = <>
+    left = 872
   end
 end

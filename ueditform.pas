@@ -68,7 +68,7 @@ var
     DBEdit : TDBEdit;
     DBComboBox : TDBLookupComboBox;
   begin
-    panel := TPanel.Create(Self);// TODO : закончить генерацию
+    panel := TPanel.Create(Self);
     panel.Align := alTop;
     panel.BorderStyle := bsNone;
     panel.BevelOuter := bvNone;
@@ -119,7 +119,7 @@ begin
     SQLQuery.InsertSQL.Text := RequestBuilder.GetInsertSQLText(FTableID);
     SQLQuery.Open;
     SQLQuery.Append;
-		end
+  end
   else begin
     SQLQuery.UpdateSQL.Text := RequestBuilder.GetUpdateSQLText(FTableID, FFieldID);
     SQLQuery.Open;
@@ -128,7 +128,8 @@ begin
   Datasource.DataSet.FieldByName('ID').Required := false;
 
   for i := MetaData[FTableID].CountOfColumns() - 1 downto 0 do begin
-    CreateEditor(MetaData[FTableID, i]);
+  	if (MetaData[FTableID, i].DBName <> 'ID') then
+	    CreateEditor(MetaData[FTableID, i]);
   end;
 end;
 

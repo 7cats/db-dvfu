@@ -5,8 +5,9 @@ unit UMain;
 interface
 
 uses
-  Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls, Graphics,
-  Dialogs, DBGrids, Menus, ExtCtrls, udb, urequestform, umetadata;
+  Classes, SysUtils, IBConnection, sqldb, db, FileUtil, Forms, Controls,
+  Graphics, Dialogs, DBGrids, Menus, ExtCtrls, Grids, udb, urequestform,
+  umetadata, urequestbuilder;
 
 type
 
@@ -14,6 +15,9 @@ type
 
   TMainForm = class(TForm)
     AbAutorItem: TMenuItem;
+    DataSource: TDataSource;
+    SQLQuery: TSQLQuery;
+    TimeTable: TDrawGrid;
     ExitItem: TMenuItem;
     FileItem: TMenuItem;
     HelpItem: TMenuItem;
@@ -24,8 +28,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ShowTableOnClick(Sender: TObject);
     procedure AddNewTableItem(nameI, captionI : string; index : integer);
+    procedure CreateDrawGrid();
   private
-    { private declarations }
+    procedure CreateTimeTable();
   public
     { public declarations }
   end;
@@ -56,10 +61,10 @@ var
   i : integer;
 begin
   DataBase.Connect();
-
   for i := 0 to MetaData.CountOfTables() do begin
     AddNewTableItem(MetaData[i].DBName + 'Item', MetaData[i].Caption, i);
   end;
+  CreateTimeTable();
 end;
 
 
@@ -79,6 +84,61 @@ begin
   NewItem.OnClick := @ShowTableOnClick;
   NewItem.Tag := index;
   ShowTableItem.Add(NewItem);
+end;
+
+procedure TMainForm.CreateDrawGrid;
+var
+  i : integer;
+begin
+  //for i := 0 to MetaData[GetTableIndex(WEEKDAYS)].F;
+  //TimeTable;
+  RequestBuilder.NewRequest(MetaData.GetTableIndex('WEEKDAYS'));
+  RequestBuilder.GetReq(SQLQuery);
+  SQLQuery.Open();
+
+  while (not DataSource.DataSet.EOF) do begin
+    for i := 1 to Datasource.DataSet.Fields.Count - 1 do begin
+      //ShowMessage(Datasource.DataSet.Fields.Fields[i].AsString);
+    end;
+    DataSource.DataSet.Next;
+  end;
+
+  RequestBuilder.NewRequest(MetaData.GetTableIndex('GROUPS'));
+  RequestBuilder.GetReq(SQLQuery);
+  SQLQuery.Open();
+
+  while (not DataSource.DataSet.EOF) do begin
+    for i := 1 to Datasource.DataSet.Fields.Count - 1 do begin
+      //ShowMessage(Datasource.DataSet.Fields.Fields[i].AsString);
+    end;
+    DataSource.DataSet.Next;
+  end;
+  SQLQuery.Close();
+end;
+
+
+procedure TMainForm.CreateTimeTable;
+var
+  i : integer;
+  fields : array of array of string;
+begin
+  SQLQuery.Transaction := DataBase.SQLTransaction;
+
+  RequestBuilder.NewRequest(MetaData.GetTableIndex('TIMETABLE'));
+  RequestBuilder.GetReq(SQLQuery);
+  SQLQuery.Open;
+
+  //DataSource.DataSet.;
+  //DataSource.DataSet.Next;
+  while (not DataSource.DataSet.EOF) do begin
+    for i := 1 to Datasource.DataSet.Fields.Count - 1 do begin
+      //ShowMessage(Datasource.DataSet.Fields.Fields[i].AsString);
+    end;
+    DataSource.DataSet.Next;
+  end;
+
+  //ShowMessage( inttostr( DataSource.DataSet.Fields.Count));
+
 end;
 
 end.

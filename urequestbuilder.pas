@@ -16,6 +16,7 @@ type
     destructor Destroy; override;
     procedure NewRequest(const TableID : integer;
       const conditions : TVectorConditions);
+    procedure NewRequest(const TableID : integer);
     procedure Initial();
     function GetInsertSQLText(tableID: integer): string;
     function GetSelectSQLText(tableID, fieldID: integer): string;
@@ -55,6 +56,7 @@ var
   i, j : integer;
   isFirst : boolean = true;
   ForeingFields : TVectorPairString;
+  s : string;
 
   procedure AddToRequest(toAddToRequest, addIfFirstTrue, addIfFirstFalse : string);
   begin
@@ -115,6 +117,13 @@ begin
   FRequest.Add('ORDER BY ' + MetaData[TableID].DBName + '.' + MetaData[TableID, 0].DBName);
 end;
 
+procedure TRequestBuilder.NewRequest(const TableID: integer);
+var
+  emptyCond : TVectorConditions;
+begin
+  NewRequest(TableID, emptyCond);
+end;
+
 
 procedure TRequestBuilder.Initial;
 begin
@@ -140,7 +149,6 @@ function TRequestBuilder.GetUpdateSQLText(tableID, fieldID: integer
     ): string;
 begin
   result := 'UPDATE ' + Metadata[TableId].DBName +  ' SET ' + MetaData[tableID].FieldListStr('%s = :%1$')  + ' where id = ' + intToStr(fieldID);
-  ShowMessage(Result);
 end;
 
 function TRequestBuilder.GetDeleteSQLText(tableID, fieldID: integer): string;
