@@ -9,7 +9,7 @@ uses
   sqldb, DB, udb, umetadata, Graphics, Buttons, DBDateTimePicker, urequestbuilder;
 
 type
-
+  //TODO: исправить утечки памяти
   {TEditForm}
 
   TEditForm = class(TForm)
@@ -22,7 +22,7 @@ type
     CancelBtn : TButton;
     ScrollBox : TScrollBox;
     procedure CancelBtnClick(Sender: TObject);
-    constructor Create(tableID, fieldID : integer; Component : TComponent);
+    constructor Create(tableID, fieldID : integer);
     procedure FormCreate(Sender: TObject);
     procedure SaveBtnClick(Sender: TObject);
     public
@@ -36,13 +36,16 @@ implementation
 
 {$R *.lfm}
 
+uses StrUtils;
+
 { TEditForm }
 
 
-constructor TEditForm.Create(tableID, fieldID: integer; Component: TComponent);
+constructor TEditForm.Create(tableID, fieldID: integer);
 begin
-  Inherited Create(Component);
-  Self.Caption := (Component as TButton).Caption + ' поле в таблицу';
+  Inherited Create(nil);
+  Self.Caption := IfThen(fieldId = -1,
+    'Добавить запись в таблицу', 'Изменить запись в таблице');
   TableNameLabel.Caption := TableNameLabel.Caption + '"' + MetaData[tableID].Caption + '"';
   FFieldID := fieldID;
   FTableID := tableID;

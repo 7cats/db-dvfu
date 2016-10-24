@@ -26,6 +26,7 @@ type
   ScrollBox : TScrollBox;
   SQLQuery: TSQLQuery;
   ApplyFiltersBtn: TToggleBox;
+  procedure AddToTableBtnClick(Sender: TObject);
   procedure ChangeTableBtnClick(Sender : TObject);
   procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect;
     DataCol: Integer; Column: TColumn; State: TGridDrawState);
@@ -64,10 +65,14 @@ begin
   try
     for i := 0 to High(FFilters) do begin
       if (FFilters[i].FOperationCB.Text = 'Like') then begin
-        filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, '%' + FFilters[i].FSearchEdit.Text + '%', FFilters[i].FFieldCB.ItemIndex);
+        filters.PushBack(
+          FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text,
+          '%' + FFilters[i].FSearchEdit.Text + '%', FFilters[i].FFieldCB.ItemIndex);
       end
       else begin
-        filters.PushBack(FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text, FFilters[i].FSearchEdit.Text, FFilters[i].FFieldCB.ItemIndex);
+        filters.PushBack(
+          FFilters[i].FFieldCB.Text, FFilters[i].FOperationCB.Text,
+          FFilters[i].FSearchEdit.Text, FFilters[i].FFieldCB.ItemIndex);
       end;
   end;
   RequestBuilder.NewRequest(TableIDInMetaData, filters);
@@ -235,16 +240,15 @@ end;
 
 
 procedure TRequestForm.ChangeTableBtnClick(Sender : TObject);
-var
-  fieldID : integer;
 begin
-  fieldID := DBGrid.DataSource.DataSet.FieldByName('ID').Value;
-  if ((Sender as TButton).Caption = 'Добавить') then begin
-    fieldID := -1;
-  end;
-  TEditForm.Create(Self.TableIDInMetaData, fieldID, Sender as TButton).Show();
+  TEditForm.Create(
+    Self.TableIDInMetaData, DBGrid.DataSource.DataSet.FieldByName('ID').Value).Show();
 end;
 
+procedure TRequestForm.AddToTableBtnClick(Sender: TObject);
+begin
+  TEditForm.Create(Self.TableIDInMetaData, -1).Show();
+end;
 
 procedure TRequestForm.ShowWithFilters;
 begin

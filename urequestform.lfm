@@ -44,7 +44,7 @@ object RequestForm: TRequestForm
     Top = 552
     Width = 75
     Caption = 'Добавить'
-    OnClick = ChangeTableBtnClick
+    OnClick = AddToTableBtnClick
     TabOrder = 3
   end
   object ChangeTableBtn: TButton

@@ -114,7 +114,7 @@ begin
     inc(j);
   end;
 
-  FRequest.Add('ORDER BY ' + MetaData[TableID].DBName + '.' + MetaData[TableID, 0].DBName);
+//  FRequest.Add('ORDER BY ' + MetaData[TableID].DBName + '.' + MetaData[TableID, 0].DBName);
 end;
 
 procedure TRequestBuilder.NewRequest(const TableID: integer);

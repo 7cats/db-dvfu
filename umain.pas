@@ -29,8 +29,13 @@ type
     procedure ShowTableOnClick(Sender: TObject);
     procedure AddNewTableItem(nameI, captionI : string; index : integer);
     procedure CreateDrawGrid();
+    procedure TimeTableDrawCell(Sender: TObject; aCol, aRow: Integer;
+      aRect: TRect; aState: TGridDrawState);
   private
+    cells: array of array of string;
     procedure CreateTimeTable();
+    function IsNameIsDay: integer;
+    function IsNameIsTime: integer;
   public
     { public declarations }
   end;
@@ -64,6 +69,9 @@ begin
   for i := 0 to MetaData.CountOfTables() do begin
     AddNewTableItem(MetaData[i].DBName + 'Item', MetaData[i].Caption, i);
   end;
+
+  SQLQuery.Transaction := DataBase.SQLTransaction;
+  CreateDrawGrid();
   CreateTimeTable();
 end;
 
@@ -87,40 +95,48 @@ begin
 end;
 
 procedure TMainForm.CreateDrawGrid;
-var
-  i : integer;
 begin
-  //for i := 0 to MetaData[GetTableIndex(WEEKDAYS)].F;
-  //TimeTable;
   RequestBuilder.NewRequest(MetaData.GetTableIndex('WEEKDAYS'));
   RequestBuilder.GetReq(SQLQuery);
   SQLQuery.Open();
 
+  SetLength(cells, 1, 1);
   while (not DataSource.DataSet.EOF) do begin
-    for i := 1 to Datasource.DataSet.Fields.Count - 1 do begin
-      //ShowMessage(Datasource.DataSet.Fields.Fields[i].AsString);
-    end;
+    SetLength(cells, 1, Length(cells[0]) + 1);
+    cells[0, High(cells[0])] := Datasource.DataSet.Fields.Fields[1].AsString;
     DataSource.DataSet.Next;
   end;
 
-  RequestBuilder.NewRequest(MetaData.GetTableIndex('GROUPS'));
+  SQLQuery.Close();
+  RequestBuilder.NewRequest(MetaData.GetTableIndex('LESSONS_TIMES'));
   RequestBuilder.GetReq(SQLQuery);
   SQLQuery.Open();
 
   while (not DataSource.DataSet.EOF) do begin
-    for i := 1 to Datasource.DataSet.Fields.Count - 1 do begin
-      //ShowMessage(Datasource.DataSet.Fields.Fields[i].AsString);
-    end;
+    SetLength(cells, Length(cells) + 1, Length(cells[0]));
+    cells[High(cells), 0] := Datasource.DataSet.Fields.Fields[1].AsString;
     DataSource.DataSet.Next;
   end;
   SQLQuery.Close();
+
+  ShowMessage(inttostr(Length(cells)));
+  TimeTable.RowCount := Length(cells);
+  TimeTable.ColCount := Length(cells[0]);
+end;
+
+
+procedure TMainForm.TimeTableDrawCell(Sender: TObject; aCol, aRow: Integer;
+  aRect: TRect; aState: TGridDrawState);
+begin
+  TimeTable.Canvas.TextRect(aRect, aRect.Left, aRect.Top, cells[aRow, aCol]);
 end;
 
 
 procedure TMainForm.CreateTimeTable;
 var
   i : integer;
-  fields : array of array of string;
+  j : integer;
+  dayidx, timeidx : integer;
 begin
   SQLQuery.Transaction := DataBase.SQLTransaction;
 
@@ -128,18 +144,34 @@ begin
   RequestBuilder.GetReq(SQLQuery);
   SQLQuery.Open;
 
-  //DataSource.DataSet.;
-  //DataSource.DataSet.Next;
   while (not DataSource.DataSet.EOF) do begin
+    dayidx := -1;
+    timeidx := -1;
     for i := 1 to Datasource.DataSet.Fields.Count - 1 do begin
-      //ShowMessage(Datasource.DataSet.Fields.Fields[i].AsString);
+
     end;
     DataSource.DataSet.Next;
   end;
+end;
 
-  //ShowMessage( inttostr( DataSource.DataSet.Fields.Count));
+function TMainForm.IsNameIsDay: integer;
+var
+  j : integer;
+begin
+  for j := 1 to High(cells) do begin
+    if (Datasource.DataSet.Fields.Fields[i].AsString = cells[0, j]) then
+      exit(j);
+  end;
+end;
 
+function TMainForm.IsNameIsTime: integer;
+var
+  j : integer;
+begin
+  for j := 1 to High(cells[0]) do begin
+    if (Datasource.DataSet.Fields.Fields[i].AsString = cells[j, 0]) then
+      exit(j);
+  end;
 end;
 
 end.
-

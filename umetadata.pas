@@ -31,7 +31,7 @@ type
 
   { TMetaTable }
 
-  TMetaTable = class  // TODO: добавить формат выходной строки
+  TMetaTable = class
   private
     FDBName, FCaption: string;
     FColumns : array of TMetaColumn;
@@ -47,7 +47,6 @@ type
     property Caption : string read FCaption;
     property Items[const index : string] : TMetaColumn read GetItem; default;
     constructor Create(ADBName, ACaption : string);
-//    constructor Create(ADBName, ACaption : string);
     destructor Destroy; override;
   end;
 
@@ -74,7 +73,8 @@ var
 implementation
 
 var
-  classrooms, groups, lessons, teachers, lassons_times, lessons_types, weekdays, timetable : TMetaTable;
+  classrooms, groups, lessons, teachers, lassons_times, lessons_types, weekdays,
+    timetable : TMetaTable;
 
 
 { TMetaColumn }
@@ -299,5 +299,5 @@ initialization
 
 finalization
   MetaData.Free;
- end.
+end.
 

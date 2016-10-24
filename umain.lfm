@@ -20,6 +20,7 @@ object MainForm: TMainForm
     Align = alClient
     ExtendedSelect = False
     TabOrder = 0
+    OnDrawCell = TimeTableDrawCell
   end
   object MainMenu: TMainMenu
     left = 16
